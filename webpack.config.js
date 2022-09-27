@@ -1,17 +1,17 @@
 //webpack.config.js
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   mode: "development",
   devtool: "inline-source-map",
-  entry: "./src/index.ts",
+  entry: "./src/spritely.ts",
   output: {
-    path: path.resolve(__dirname, 'build/'),
+    path: path.resolve(__dirname, "build/"),
     filename: "rts.js", // <--- Will be compiled to this single file
-    library: "RTS",
+    library: "RTS"
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: [".ts", ".tsx", ".js"]
   },
   module: {
     rules: [
@@ -20,5 +20,5 @@ module.exports = {
         loader: "ts-loader"
       }
     ]
-  },
+  }
 };
