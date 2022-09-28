@@ -4,7 +4,7 @@ const path = require("path");
 module.exports = {
   mode: "development",
   devtool: "inline-source-map",
-  entry: "./src/spritely.ts",
+  entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "build/"),
     filename: "rts.js", // <--- Will be compiled to this single file
