@@ -4,6 +4,7 @@ export abstract class PhysicsObject extends BaseObject {
     vx = 0;
     vy = 0;
     decellerationFactor = 1;
+    size: number;
 
     update(delta: number) {
         super.update(delta);
