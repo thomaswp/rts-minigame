@@ -1,4 +1,5 @@
 import { DisplayObject, Graphics } from "pixi.js";
+import { Action } from "../util/Action";
 import { PhysicsObject } from "./PhysicsObject";
 
 export class Projectile extends PhysicsObject {
@@ -10,7 +11,7 @@ export class Projectile extends PhysicsObject {
     super();
     this.graphics = new Graphics();
     this.updateGraphics();
-    this.decellerationFactor = 0.99;
+    this.decellerationFactor = 0.995;
     this.color = color;
     this.lifespan = lifespan;
   }
@@ -32,17 +33,11 @@ export class Projectile extends PhysicsObject {
     super.update(delta);
     this.updateGraphics();
     if (this.elapsedFrames > this.lifespan) {
-      this.kill();
-    }
-  }
-
-  kill() { // should all base objects have a kill function? should they just flag themselves as dead and then the world can clean up dead objects each update?
-    let index = this.world.objects.indexOf(this);
-    if (index !== -1) {
-      this.world.objects.splice(index, 1); // is there a better way than just removing the object from the objects array? this ensures it won't update anymore, but can we/do we need to delete it?
-      let canvas = this.graphics;
-      canvas.clear();
-      console.log('i die');
+      this.lifespan = Number.POSITIVE_INFINITY;
+      this.run(delta => {
+        this.g.alpha *= 0.9;
+        return this.g.alpha < 0.01;
+      }).then(() => this.die());
     }
   }
 }
