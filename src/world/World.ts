@@ -1,4 +1,4 @@
-import { Application, ArrayResource, Container, Point, Runner } from "pixi.js";
+import { Application, ArrayResource, Container, Graphics, Point, Runner } from "pixi.js";
 import { BaseObject } from "../objects/BaseObject";
 import { Battler } from "../objects/Battler";
 import { Hero } from "../objects/Hero";
@@ -28,6 +28,7 @@ export class World {
     objects = [] as BaseObject[];
 
     gameStage: Container;
+    stars = [] as Container[];
 
     engine: Matter.Engine;
 
@@ -48,9 +49,12 @@ export class World {
             x: 0, y: 0, scale: 0.001,
         }
 
+        this.createBackground();
+
         this.gameStage = new Container();
         this.gameStage.x = this.app.view.width / 2;
         this.gameStage.y = this.app.view.height / 2;
+        this.gameStage.zIndex = 1;
         this.app.stage.addChild(this.gameStage);
 
         this.maxX = this.app.view.width / 2;
@@ -64,6 +68,33 @@ export class World {
         for (let i = 0; i < 10; i++) {
             this.addObject(new Battler(0xcc3333));
             this.addObject(this.cameraTarget = new Battler(0x3333cc));
+        }
+
+    }
+
+    createBackground() {
+        let star = new Graphics();
+        star.clear();
+        star.beginFill(0xFFFFFF);
+        star.drawCircle(0, 0, 1.5);
+        star.endFill();
+
+        const range = 5000;
+        const nStars = 500;
+
+        for (let i = 0; i < 3; i++) {
+            let field = new Container();
+            field.zIndex = -(i + 1);
+            this.stars.push(field)
+            this.app.stage.addChild(field);
+
+            for (let i = 0; i < nStars; i++) {
+                let s = star.clone();
+                s.x = Math.random() * range - range / 2;
+                s.y = Math.random() * range - range / 2;
+                s.scale.x = s.scale.y = Math.random() * 0.5 + 0.75;
+                field.addChild(s);
+            }
         }
     }
 
@@ -116,8 +147,19 @@ export class World {
         let snap = 0.05;
         let scale = lerp(this.gameStage.scale.x, this.cameraZoom, snap, 0.001);
         this.gameStage.scale = {x: scale, y: scale};
-        this.gameStage.x = lerp(this.gameStage.x, -this.cameraX * this.cameraZoom + this.app.view.width / 2, snap, 0.3);
-        this.gameStage.y = lerp(this.gameStage.y, -this.cameraY * this.cameraZoom + this.app.view.height / 2, snap, 0.3);
+        let offX = -this.cameraX * this.cameraZoom;
+        let offY = -this.cameraY * this.cameraZoom;
+        let hw = this.app.view.width / 2;
+        let hh = this.app.view.height / 2;
+        this.gameStage.x = lerp(this.gameStage.x, offX + hw, snap, 0.3);
+        this.gameStage.y = lerp(this.gameStage.y, offY + hh, snap, 0.3);
+
+        this.stars.forEach(field => {
+            field.scale.x = this.gameStage.scale.x;
+            field.scale.y = this.gameStage.scale.y;
+            field.x = (this.gameStage.x - hw) / (field.zIndex + 6) * -1 + hw;
+            field.y = (this.gameStage.y - hh) / (field.zIndex + 6) * -1 + hh;
+        })
     }
 
     tick(delta) {
