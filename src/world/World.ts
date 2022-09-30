@@ -1,4 +1,4 @@
-import { Application, Container, Point, Runner } from "pixi.js";
+import { Application, ArrayResource, Container, Point, Runner } from "pixi.js";
 import { BaseObject } from "../objects/BaseObject";
 import { Battler } from "../objects/Battler";
 import { Hero } from "../objects/Hero";
@@ -9,6 +9,7 @@ import { Updatable } from "../util/Action";
 import * as Matter from 'matter-js';
 import * as PolyDecomp from 'poly-decomp'
 import * as hull from 'hull.js'
+import { lerp } from "../util/MathUtil";
 
 export class World {
     app: Application;
@@ -29,6 +30,12 @@ export class World {
     gameStage: Container;
 
     engine: Matter.Engine;
+
+    cameraX = 0;
+    cameraY = 0;
+    cameraZoom = 1;
+
+    cameraTarget: BaseObject;
 
     constructor(app: Application) {
         this.app = app;
@@ -56,7 +63,7 @@ export class World {
 
         for (let i = 0; i < 10; i++) {
             this.addObject(new Battler(0xcc3333));
-            this.addObject(new Battler(0x3333cc));
+            this.addObject(this.cameraTarget = new Battler(0x3333cc));
         }
     }
 
@@ -75,6 +82,44 @@ export class World {
         return true;
     }
 
+    updateCamera() {
+        if (!this.cameraTarget.isInWorld || Math.random() < 0.002) {
+            this.cameraTarget = this.objects[Math.floor(this.objects.length * Math.random())]
+        }
+
+        // this.cameraX = this.cameraTarget.g.x;
+        // this.cameraY = this.cameraTarget.g.y;
+
+        let cameraObjects = this.objects.filter(o => o.shouldStayOnCamera());
+
+        let xs = cameraObjects.map(o => o.g.x);
+        let ys = cameraObjects.map(o => o.g.y);
+
+        let left = xs.reduce((a, b) => Math.min(a, b), Number.POSITIVE_INFINITY);
+        let right = xs.reduce((a, b) => Math.max(a, b), Number.NEGATIVE_INFINITY);
+        let top = ys.reduce((a, b) => Math.min(a, b), Number.POSITIVE_INFINITY);
+        let bottom = ys.reduce((a, b) => Math.max(a, b), Number.NEGATIVE_INFINITY);
+
+        let buffer = 50;
+        let width = right - left + buffer * 2;
+        let height = bottom - top + buffer * 2;
+
+        let scaleX = this.app.view.width / width;
+        let scaleY = this.app.view.height / height;
+
+        this.cameraZoom = Math.min(scaleX, scaleY);
+        this.cameraX = (left + right) / 2;
+        this.cameraY = (top + bottom) / 2;
+    }
+
+    updateGameStage() {
+        let snap = 0.05;
+        let scale = lerp(this.gameStage.scale.x, this.cameraZoom, snap, 0.001);
+        this.gameStage.scale = {x: scale, y: scale};
+        this.gameStage.x = lerp(this.gameStage.x, -this.cameraX * this.cameraZoom + this.app.view.width / 2, snap, 0.3);
+        this.gameStage.y = lerp(this.gameStage.y, -this.cameraY * this.cameraZoom + this.app.view.height / 2, snap, 0.3);
+    }
+
     tick(delta) {
         // let func = (x, y) => 3 * x;
         // func(3, 4);
@@ -84,6 +129,11 @@ export class World {
         //         thingToDo(item);
         //     }
         // }
+
+        // this.cameraZoom *= 1.001;
+
+        this.updateCamera();
+        this.updateGameStage();
 
         Matter.Engine.update(this.engine, 1000 / 60 * delta);
 

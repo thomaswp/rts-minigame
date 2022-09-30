@@ -20,6 +20,10 @@ export class Projectile extends PhysicsObject {
     this.size = size;
   }
 
+  shouldStayOnCamera() {
+    return false;
+  }
+
   createBody(): Matter.Body {
     let body = Matter.Bodies.circle(this.g.x, this.g.y, this.size);
     body.frictionAir = 0.02;

@@ -14,6 +14,10 @@ export abstract class BaseObject implements Updater {
 
     abstract getDisplayObject() : DisplayObject;
 
+    shouldStayOnCamera(): boolean {
+        return true;
+    }
+
     onAddedToWorld(): void {};
 
     update(delta: number) {
