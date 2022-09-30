@@ -1,3 +1,4 @@
+import * as Matter from 'matter-js';
 import { DisplayObject, Graphics } from "pixi.js";
 import { argMax, argMin } from "../util/MathUtil";
 import { BaseObject } from "./BaseObject"
@@ -28,19 +29,11 @@ export class Battler extends PhysicsObject {
     private framesSinceFired = 0;
     private framesSinceEvaded = 0;
     
-    get direction() { return this.g.rotation; };
-    set direction(value) { 
-        while (value < -Math.PI) value += Math.PI * 2;
-        if (value > Math.PI) value %= Math.PI * 2;
-        this.g.rotation = value; 
-    };  
-    
     get dx() { return Math.cos(this.direction); }
     get dy() { return Math.sin(this.direction); }
 
     constructor(team: number, size = 15) {
         super();
-        this.decellerationFactor = 0.98;
         this.graphics = new Graphics();
         this.graphics = this.updateGraphics();
         this.team = team;
@@ -50,7 +43,13 @@ export class Battler extends PhysicsObject {
         this.size = size;
     }
 
+    createBody(): Matter.Body {
+        let body = Matter.Bodies.circle(this.g.x, this.g.y, this.size);
+        return body;
+    }
+
     onAddedToWorld(): void {
+        super.onAddedToWorld();
         this.updateTarget();
     }
 
@@ -76,13 +75,14 @@ export class Battler extends PhysicsObject {
 
     shoot() {
         let bullet = new Projectile(this.team, 90);
+
         this.world.addObject(bullet);
         
         let dx = this.dx;
         let dy = this.dy;
-
-        bullet.g.x = this.g.x + this.size * dx;
-        bullet.g.y = this.g.y + this.size * dy;
+        
+        bullet.x = this.x + this.size * dx;
+        bullet.y = this.y + this.size * dy;
         bullet.vx = this.vx + dx * 10;
         bullet.vy = this.vy + dy * 10;
     }
@@ -107,6 +107,8 @@ export class Battler extends PhysicsObject {
     }
 
     update(delta: number): void {
+        super.update(delta);
+
         this.applyThrust();
         super.update(delta);
         this.updateGraphics();

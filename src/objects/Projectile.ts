@@ -1,3 +1,4 @@
+import * as Matter from 'matter-js';
 import { DisplayObject, Graphics } from "pixi.js";
 import { Action } from "../util/Action";
 import { argMin } from "../util/MathUtil";
@@ -8,15 +9,21 @@ export class Projectile extends PhysicsObject {
   graphics: Graphics;
   team: number;
   lifespan: number;
+  size: number;
 
   constructor(team = 0xcc3333, lifespan = 60, size = 4) { // = 0xcc3333
     super();
     this.graphics = new Graphics();
     this.updateGraphics();
-    this.decellerationFactor = 0.995;
     this.team = team;
     this.lifespan = lifespan;
     this.size = size;
+  }
+
+  createBody(): Matter.Body {
+    let body = Matter.Bodies.circle(this.g.x, this.g.y, this.size);
+    body.frictionAir = 0.02;
+    return body;
   }
 
   updateGraphics() {

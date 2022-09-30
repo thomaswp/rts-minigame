@@ -17,8 +17,12 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "@types/matter-js": "^0.18.2",
+    "hull.js": "^1.0.2",
+    "matter-js": "^0.18.0",
     "pixi.js": "^6.5.4",
     "pixi.js-keyboard": "^1.1.6",
-    "pixi.js-mouse": "^1.1.6"
+    "pixi.js-mouse": "^1.1.6",
+    "poly-decomp": "^0.3.0"
   }
 }

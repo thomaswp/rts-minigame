@@ -1,19 +1,57 @@
 import { BaseObject } from "./BaseObject";
+import * as Matter from 'matter-js';
+
+function v(x: number, y: number) {
+    return Matter.Vector.create(x, y);
+}
 
 export abstract class PhysicsObject extends BaseObject {
-    vx = 0;
-    vy = 0;
-    decellerationFactor = 1;
-    size: number;
+    
+    get x() { return this.body.position.x; }
+    get y() { return this.body.position.y; }
+
+    set x(value) { Matter.Body.setPosition(this.body, v(value, this.body.position.y)); }
+    set y(value) { Matter.Body.setPosition(this.body, v(this.body.position.x, value)); }
+
+    get vx() { return this.body.velocity.x; }
+    get vy() { return this.body.velocity.y; }
+
+    set vx(value) { Matter.Body.setVelocity(this.body, v(value, this.body.velocity.y)); }
+    set vy(value) { Matter.Body.setVelocity(this.body, v(this.body.velocity.x, value)); }
+
+    get direction() { return this.body.angle; };
+    set direction(value) { 
+        while (value < -Math.PI) value += Math.PI * 2;
+        if (value > Math.PI) value %= Math.PI * 2;
+        Matter.Body.setAngle(this.body, value);
+        this.g.rotation = value;
+    };  
+
+    get decellerationFactor() { return this.body.frictionAir; }
+    set decellerationFactor(value) { this.body.frictionAir = value; }
+
+    body: Matter.Body;
+
+    abstract createBody(): Matter.Body;
+
+    onAddedToWorld() {
+        super.onAddedToWorld();
+        this.body = this.createBody();
+        Matter.Body.setPosition(this.body, v(this.g.x, this.g.y));
+        Matter.Composite.add(this.world.engine.world, this.body);
+    }
+
+    die(): void {
+        super.die();
+        Matter.Composite.remove(this.world.engine.world, this.body);
+    }
 
     update(delta: number) {
         super.update(delta);
 
-        this.vy += this.world.gravity * delta;
-        this.vx *= this.decellerationFactor;
-        this.vy *= this.decellerationFactor;
-        this.g.x += this.vx * delta;
-        this.g.y += this.vy * delta;
+        this.g.x = this.body.position.x;
+        this.g.y = this.body.position.y;
+        this.g.rotation = this.body.angle;
     }
 
     accelerateInDir(direction, magnitude) {
