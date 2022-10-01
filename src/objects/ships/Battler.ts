@@ -82,7 +82,9 @@ export abstract class Battler extends PhysicsObject {
         super.update(delta);
         this.updateGraphics();
 
-        if (this.dying) 
+        if (this.dying) {
+            return; // we forgot to finish this if statemnt, which was causing a lot of the weird behavior
+        }
 
         if (!this.target || !this.target.isInWorld) {
             this.updateTarget();

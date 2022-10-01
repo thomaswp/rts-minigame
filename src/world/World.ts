@@ -12,6 +12,7 @@ import * as hull from 'hull.js'
 import { lerp } from "../util/MathUtil";
 import { BlobShip } from "../objects/ships/BlobShip";
 import { ObjectContainer } from "./BaseObject";
+import { Game } from "./Game";
 
 export class World implements ObjectContainer {
     
@@ -35,6 +36,7 @@ export class World implements ObjectContainer {
     cameraZoom = 1;
 
     cameraTarget: WorldObject;
+    game: Game;
 
     constructor(width, height) {
         this.width = width;
@@ -61,10 +63,13 @@ export class World implements ObjectContainer {
         // this.hero = new Hero();
         // this.addObject(this.hero);
 
-        for (let i = 0; i < 10; i++) {
-            this.addObject(new BlobShip(0xcc3333));
-            this.addObject(this.cameraTarget = new BlobShip(0x3333cc));
-        }
+        this.addObject(this.cameraTarget = new BlobShip(0x3333cc)); // adding this so the camera has an initial target, but how can we initialize the world with an empty arena?
+        // i guess ideally we want a starting camera dimensions, with nothing on the field, then the ability to add a bunch of objects and only begin the simulation when we click go
+
+        // for (let i = 0; i < 10; i++) {
+        //     this.addObject(new BlobShip(0xcc3333));
+        //     this.addObject(this.cameraTarget = new BlobShip(0x3333cc));
+        // }
 
     }
 
@@ -95,6 +100,7 @@ export class World implements ObjectContainer {
     }
 
     addObject(obj: WorldObject) {
+        // console.log('added ', obj.constructor.name, obj);
         obj.world = this;
         this.objects.push(obj);
         this.gameStage.addChild(obj.g);

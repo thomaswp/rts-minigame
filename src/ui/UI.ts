@@ -2,11 +2,13 @@ import { Container } from "pixi.js";
 import { WorldObject } from "../objects/WorldObject";
 import { removeFrom } from "../util/MathUtil";
 import { BaseObject, ObjectContainer } from "../world/BaseObject";
+import { Game } from "../world/Game";
 import { Button } from "./Button";
 import { InterfaceObject } from "./InterfaceObject";
 
 export class UI implements ObjectContainer {
     mainContainer: Container;
+    game: Game;
 
     objects = [] as InterfaceObject[];
 
@@ -24,6 +26,7 @@ export class UI implements ObjectContainer {
     }
 
     addObject(obj: InterfaceObject) {
+        // console.log('added ', obj.constructor.name, obj);
         obj.world = this;
         this.objects.push(obj);
         this.mainContainer.addChild(obj.g);
