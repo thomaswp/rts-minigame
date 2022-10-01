@@ -6,7 +6,7 @@ module.exports = {
   devtool: "inline-source-map",
   entry: "./src/index.ts",
   output: {
-    path: path.resolve(__dirname, "build/"),
+    path: path.resolve(__dirname, "static/js"),
     filename: "rts.js", // <--- Will be compiled to this single file
     library: "RTS"
   },
