@@ -1,6 +1,6 @@
 import { Application, ArrayResource, Container, Graphics, Point, Runner } from "pixi.js";
 import { BaseObject } from "../objects/BaseObject";
-import { Battler } from "../objects/Battler";
+import { Battler } from "../objects/ships/Battler";
 import { Hero } from "../objects/Hero";
 import { PhysicsObject } from "../objects/PhysicsObject";
 import { Updatable } from "../util/Action";
@@ -10,7 +10,7 @@ import * as Matter from 'matter-js';
 import * as PolyDecomp from 'poly-decomp'
 import * as hull from 'hull.js'
 import { lerp } from "../util/MathUtil";
-import { BlobShip } from "../objects/BlobShip";
+import { BlobShip } from "../objects/ships/BlobShip";
 
 export class World {
     app: Application;

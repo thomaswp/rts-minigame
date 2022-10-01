@@ -1,10 +1,6 @@
-import { BaseObject } from "./BaseObject";
 import { Battler } from "./Battler";
 import * as Matter from 'matter-js';
-import { DisplayObject, Graphics } from "pixi.js";
-import { argMin } from "../util/MathUtil";
-import { PhysicsObject } from "./PhysicsObject";
-import { Projectile } from "./Projectile";
+import { Projectile } from "../projectile/Projectile";
 
 export class BlobShip extends Battler {
      

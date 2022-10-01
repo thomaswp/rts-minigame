@@ -1,9 +1,9 @@
 import * as Matter from 'matter-js';
 import { DisplayObject, Graphics } from "pixi.js";
-import { Action } from "../util/Action";
-import { argMin } from "../util/MathUtil";
-import { Battler } from "./Battler";
-import { PhysicsObject } from "./PhysicsObject";
+import { Action } from "../../util/Action";
+import { argMin } from "../../util/MathUtil";
+import { Battler } from "../ships/Battler";
+import { PhysicsObject } from "../PhysicsObject";
 
 export class Projectile extends PhysicsObject {
   graphics: Graphics;
