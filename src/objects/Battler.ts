@@ -23,7 +23,7 @@ export abstract class Battler extends PhysicsObject {
     get dy() { return Math.sin(this.direction); }
 
     constructor(team: number, size = 15) {
-        super();
+        super(); // do we need this when our parents are abstract classes?
         this.graphics = new Graphics();
         this.graphics = this.updateGraphics();
         this.team = team;
