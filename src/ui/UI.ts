@@ -2,6 +2,7 @@ import { Container } from "pixi.js";
 import { WorldObject } from "../objects/WorldObject";
 import { removeFrom } from "../util/MathUtil";
 import { BaseObject, ObjectContainer } from "../world/BaseObject";
+import { Button } from "./Button";
 import { InterfaceObject } from "./InterfaceObject";
 
 export class UI implements ObjectContainer {
@@ -11,6 +12,11 @@ export class UI implements ObjectContainer {
 
     constructor() {
         this.mainContainer = new Container();
+
+        let button = new Button(30, 0xFF00FF);
+        button.g.x = 50;
+        button.g.y = 50;
+        this.addObject(button);
     }
 
     removeObject(object: InterfaceObject): boolean {
@@ -25,6 +31,8 @@ export class UI implements ObjectContainer {
     }
 
     update(delta: number) {
-        
+        this.objects.forEach(obj => {
+            obj.update(delta);
+        });
     }
 }

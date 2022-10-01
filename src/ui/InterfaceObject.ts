@@ -5,9 +5,5 @@ import { BaseObject } from "../world/BaseObject";
 import { UI } from "./UI";
 
 export abstract class InterfaceObject extends BaseObject<UI> {
-
-    update(delta: number): void {
-        
-    }
     
 }
