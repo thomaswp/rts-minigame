@@ -11,23 +11,20 @@ import * as PolyDecomp from 'poly-decomp'
 import * as hull from 'hull.js'
 import { lerp } from "../util/MathUtil";
 import { BlobShip } from "../objects/ships/BlobShip";
+import { ObjectContainer } from "./BObject";
 
-export class World {
-    app: Application;
+export class World implements ObjectContainer {
+    
+    width: number;
+    height: number;
+
     hero: Hero;
-
-    minX: number;
-    maxX: number;
-    minY: number;
-    maxY: number;
-
-    get width() { return this.maxX - this.minX; }
-    get height() { return this.maxY - this.minY; }
 
     gravity = 0;
 
     objects = [] as BaseObject[];
 
+    mainContainer: Container;
     gameStage: Container;
     stars = [] as Container[];
 
@@ -39,8 +36,9 @@ export class World {
 
     cameraTarget: BaseObject;
 
-    constructor(app: Application) {
-        this.app = app;
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
 
         Matter.Common.setDecomp(PolyDecomp);
         this.engine = Matter.Engine.create({
@@ -50,18 +48,15 @@ export class World {
             x: 0, y: 0, scale: 0.001,
         }
 
+        this.mainContainer = new Container();
+        this.mainContainer.x = width / 2;
+        this.mainContainer.y = height / 2;
+
         this.createBackground();
 
         this.gameStage = new Container();
-        this.gameStage.x = this.app.view.width / 2;
-        this.gameStage.y = this.app.view.height / 2;
         this.gameStage.zIndex = 1;
-        this.app.stage.addChild(this.gameStage);
-
-        this.maxX = this.app.view.width / 2;
-        this.minX = -this.app.view.width / 2;
-        this.maxY = this.app.view.height / 2;
-        this.minY = -this.app.view.height / 2;
+        this.mainContainer.addChild(this.gameStage);
 
         // this.hero = new Hero();
         // this.addObject(this.hero);
@@ -87,7 +82,7 @@ export class World {
             let field = new Container();
             field.zIndex = -(i + 1);
             this.stars.push(field)
-            this.app.stage.addChild(field);
+            this.mainContainer.addChild(field);
 
             for (let i = 0; i < nStars; i++) {
                 let s = star.clone();
@@ -136,8 +131,8 @@ export class World {
         let width = right - left + buffer * 2;
         let height = bottom - top + buffer * 2;
 
-        let scaleX = this.app.view.width / width;
-        let scaleY = this.app.view.height / height;
+        let scaleX = this.width / width;
+        let scaleY = this.height / height;
 
         this.cameraZoom = Math.min(scaleX, scaleY);
         this.cameraX = (left + right) / 2;
@@ -150,20 +145,18 @@ export class World {
         this.gameStage.scale = {x: scale, y: scale};
         let offX = -this.cameraX * this.cameraZoom;
         let offY = -this.cameraY * this.cameraZoom;
-        let hw = this.app.view.width / 2;
-        let hh = this.app.view.height / 2;
-        this.gameStage.x = lerp(this.gameStage.x, offX + hw, snap, 0.3);
-        this.gameStage.y = lerp(this.gameStage.y, offY + hh, snap, 0.3);
+        this.gameStage.x = lerp(this.gameStage.x, offX, snap, 0.3);
+        this.gameStage.y = lerp(this.gameStage.y, offY, snap, 0.3);
 
         this.stars.forEach(field => {
             field.scale.x = this.gameStage.scale.x;
             field.scale.y = this.gameStage.scale.y;
-            field.x = (this.gameStage.x - hw) / (field.zIndex + 6) * -1 + hw;
-            field.y = (this.gameStage.y - hh) / (field.zIndex + 6) * -1 + hh;
+            field.x = (this.gameStage.x) / (field.zIndex + 6) * -1
+            field.y = (this.gameStage.y) / (field.zIndex + 6) * -1;
         })
     }
 
-    tick(delta) {
+    update(delta) {
         // let func = (x, y) => 3 * x;
         // func(3, 4);
 
@@ -180,20 +173,8 @@ export class World {
 
         Matter.Engine.update(this.engine, 1000 / 60 * delta);
 
-        // const buffer = 30;
         this.objects.forEach(obj => {
             obj.update(delta);
-        //     if (!(obj instanceof PhysicsObject)) return;
-        //     // try bouncing instead of wrapping...if exceed x bound, flip vx, if exceed y bound, flip vy, but may need a small constant push so they don't get stuck on the wall
-        //     // let b = 10;
-        //     if (obj.g.x > this.maxX - obj.size) obj.vx *= -1;
-        //     if (obj.g.y > this.maxY - obj.size) obj.vy *= -1;
-        //     if (obj.g.x < this.minX + obj.size) obj.vx *= -1;
-        //     if (obj.g.y < this.minY + obj.size) obj.vy *= -1;
-            // if (obj.g.x > this.maxX + buffer) obj.g.x -= this.width + buffer * 2;
-            // if (obj.g.y > this.maxY + buffer) obj.g.y -= this.height + buffer * 2;
-            // if (obj.g.x < this.minX - buffer) obj.g.x += this.width + buffer * 2;
-            // if (obj.g.y < this.minY - buffer) obj.g.y += this.height + buffer * 2;
         });
     }
 }

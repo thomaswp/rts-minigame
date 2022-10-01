@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { Game } from "./world/Game";
 import { World } from "./world/World";
 
 window.onload = function() {
@@ -9,10 +10,9 @@ window.onload = function() {
     });
     document.body.appendChild(app.view);
 
-    // Add a ticker callback to move the sprite back and forth
-    let world = new World(app);
+    let game = new Game(app);
 
     app.ticker.add(delta => {
-        world.tick(delta);  
+        game.update(delta);  
     });
 };

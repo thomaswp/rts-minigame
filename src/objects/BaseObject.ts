@@ -1,10 +1,10 @@
 import { DisplayObject } from "pixi.js";
 import { Action, Updatable, UpdateFunction, Updater } from "../util/Action";
+import { BObject } from "../world/BObject";
 import { World } from "../world/World";
 
-export abstract class BaseObject implements Updater {
+export abstract class BaseObject extends BObject<World> implements Updater {
 
-    id = 'abcd';
     elapsedFrames = 0;
     world: World;
     updatables = [] as Updatable[];
@@ -16,29 +16,6 @@ export abstract class BaseObject implements Updater {
 
     shouldStayOnCamera(): boolean {
         return true;
-    }
-
-    onAddedToWorld(): void {};
-
-    update(delta: number) {
-        this.elapsedFrames += delta;
-        this.updatables.forEach(u => u.update(delta));
-    }
-
-    run(update: UpdateFunction) : Action {
-        let action = new Action(this, update);
-        action.run();
-        return action;
-    }
-
-    die() {
-        this.world.removeObject(this);
-    }
-
-    doEvery(action, frames) {
-        this.run(action)
-        .wait(frames)
-        .then(() => this.doEvery(action, frames));
     }
 
     directionTo(x: number, y: number) {
