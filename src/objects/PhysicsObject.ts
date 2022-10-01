@@ -46,8 +46,8 @@ export abstract class PhysicsObject extends WorldObject {
         Matter.Composite.remove(this.world.engine.world, this.body);
     }
 
-    update(delta: number) {
-        super.update(delta);
+    update() {
+        super.update();
 
         this.g.x = this.body.position.x;
         this.g.y = this.body.position.y;

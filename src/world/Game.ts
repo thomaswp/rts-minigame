@@ -1,4 +1,5 @@
 import { Application } from "pixi.js";
+import { Sync } from "../sync/Sync";
 import { UI } from "../ui/UI";
 import { World } from "./World";
 
@@ -8,8 +9,12 @@ export class Game {
     world: World;
     ui: UI;
 
+    private framesBehind = 0;
+
     constructor(app: Application) {
         this.app = app;
+
+        Sync.init(12345);
 
         // Add a ticker callback to move the sprite back and forth
         this.world = new World(app.view.width, app.view.height);
@@ -24,7 +29,12 @@ export class Game {
 
 
     update(delta: number) {
-        this.world.update(delta);
-        this.ui.update(delta);
+        this.framesBehind += delta;
+        while (this.framesBehind > 1) {
+            this.world.update();
+            this.ui.update();
+
+            this.framesBehind--;
+        }
     }
 }

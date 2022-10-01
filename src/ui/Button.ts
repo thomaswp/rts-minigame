@@ -1,5 +1,6 @@
 import { DisplayObject, Graphics } from "pixi.js";
 import { BlobShip } from "../objects/ships/BlobShip";
+import { Sync } from "../sync/Sync";
 import { InterfaceObject } from "./InterfaceObject";
 
 export class Button extends InterfaceObject {
@@ -7,8 +8,8 @@ export class Button extends InterfaceObject {
     graphics: Graphics;
     color: number;
     size: number
-    // isDown: boolean;
-    // isOver: boolean;
+    isDown: boolean;
+    isOver: boolean;
 
     constructor(size: number, color: number) {
         super();   
@@ -55,7 +56,7 @@ export class Button extends InterfaceObject {
         // console.log(this); // again confirms 'this' is the button, but it's somehow both?
         // console.log(super.constructor.name); //InterfaceObject
         if (this.isOver) {
-            if (Math.random() < .5) {
+            if (Sync.random.boolean()) {
                 this.world.game.world.addObject(new BlobShip(0xcc3333)); // this.world.game.world is not the most intuitive
             } else {
                 this.world.game.world.addObject(new BlobShip(0x3333cc)); // would look like this.world.game.ui going the other way (a world object accessing a ui object)
@@ -73,8 +74,8 @@ export class Button extends InterfaceObject {
         this.isOver = false;
     }
     
-    update(delta: number): void {
-        super.update(delta);
+    update(): void {
+        super.update();
         this.updateGraphics();
         let scale =  1 + 0.05 * Math.cos(this.elapsedFrames / 20);
         this.g.scale.x = this.g.scale.y = scale;

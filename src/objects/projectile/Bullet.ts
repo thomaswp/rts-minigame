@@ -19,8 +19,8 @@ export class Bullet extends Projectile {
         canvas.endFill();
     }
 
-    update(delta: number): void {
-        super.update(delta);
+    update(): void {
+        super.update();
         let enemy = this.getNearestEnemy()
         if (this.distanceTo(enemy) < this.size + enemy.size) {
             enemy.health -= 1;
@@ -29,7 +29,7 @@ export class Bullet extends Projectile {
         }
         if (this.elapsedFrames > this.lifespan) {
             this.lifespan = Number.POSITIVE_INFINITY;
-            this.run(delta => {
+            this.run(() => {
                 this.g.alpha *= 0.9;
                 return this.g.alpha < 0.01;
             }).then(() => this.die());

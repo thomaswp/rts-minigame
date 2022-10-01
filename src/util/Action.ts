@@ -1,13 +1,13 @@
 
 export interface Updatable {
-    update(delta: number): void;
+    update(): void;
 }
 
 export interface Updater {
     updatables: Updatable[];
 }
 
-export type UpdateFunction = (delta: number) => (boolean | void)
+export type UpdateFunction = () => (boolean | void)
 
 export class Action implements Updatable {
 
@@ -26,8 +26,8 @@ export class Action implements Updatable {
         return this;
     }
 
-    update(delta: number) {
-        let result = this.updater(delta);
+    update() {
+        let result = this.updater();
         if (result === undefined || result) {
             let index = this.runner.updatables.indexOf(this);
             if (index !== -1) this.runner.updatables.splice(index, 1);
@@ -41,8 +41,8 @@ export class Action implements Updatable {
     }
 
     wait(frames: number) {
-        return this.then(delta => {
-            frames -= delta;
+        return this.then(() => {
+            frames -= 1;
             return frames <= 0;
         })
     }

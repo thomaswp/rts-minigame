@@ -33,9 +33,9 @@ export class UI implements ObjectContainer {
         obj.onAddedToWorld();
     }
 
-    update(delta: number) {
+    update() {
         this.objects.forEach(obj => {
-            obj.update(delta);
+            obj.update();
         });
     }
 }

@@ -20,9 +20,9 @@ export abstract class BaseObject<WorldType extends ObjectContainer> implements U
 
     onAddedToWorld(): void {};
 
-    update(delta: number) {
-        this.elapsedFrames += delta;
-        this.updatables.forEach(u => u.update(delta));
+    update() {
+        this.elapsedFrames += 1;
+        this.updatables.forEach(u => u.update());
     }
 
     run(update: UpdateFunction) : Action {

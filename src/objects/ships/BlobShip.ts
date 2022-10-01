@@ -2,6 +2,7 @@ import { Battler } from "./Battler";
 import * as Matter from 'matter-js';
 import { Projectile } from "../projectile/Projectile";
 import { Bullet } from "../projectile/Bullet";
+import { Sync } from "../../sync/Sync";
 
 export class BlobShip extends Battler {
      
@@ -54,15 +55,15 @@ export class BlobShip extends Battler {
     }
     
 
-    update(delta: number): void {
-        super.update(delta);
+    update(): void {
+        super.update();
 
         this.applyThrust();
 
         if (this.dying) return;
 
-        this.framesSinceFired += delta;
-        this.framesSinceEvaded += delta;
+        this.framesSinceFired += 1;
+        this.framesSinceEvaded += 1;
 
         if (!this.target) return;
 
@@ -84,9 +85,9 @@ export class BlobShip extends Battler {
         if (diff < 0) diff += Math.PI * 2;
         let rotationDir;
         if (diff > 0 && diff < Math.PI) {
-            rotationDir = -3 * delta;
+            rotationDir = -3;
         } else {
-            rotationDir = 3 * delta;
+            rotationDir = 3;
         }
         this.direction += rotationDir * this.turnSpeed;
 
@@ -109,7 +110,7 @@ export class BlobShip extends Battler {
             //     let distanceToChaser = this.distanceTo(this.chasingMe);
             //     if (distanceToChaser < 300) {
             //         let dirToChaser = this.directionTo(this.chasingMe.g.x, this.chasingMe.g.y);
-            //         this.accelerateInDir(-dirToChaser + Math.random(), 0.1);
+            //         this.accelerateInDir(-dirToChaser + Sync.random.float(), 0.1);
             //         // this.thrust = 5;
             //     }
             // }
@@ -120,11 +121,11 @@ export class BlobShip extends Battler {
         if (closestEnemy) {
             let distanceToChaser = this.distanceTo(closestEnemy);
             if (distanceToChaser <= 350 && this.framesSinceEvaded >= this.evasionInterval) {
-                if (Math.random() > .25) return; // just a temporary hack so they don't all 'evade' for the first time at the exact same instant
+                if (Sync.random.chance(0.75)) return; // just a temporary hack so they don't all 'evade' for the first time at the exact same instant
                 let dirToChaser = this.directionTo(closestEnemy.g.x, closestEnemy.g.y);
                 let magnitude = (350 - distanceToChaser) / 200; // evade harder if the enemy is closer, may want this to be nonlinear, also not sure if i like it logically
                 this.accelerateInDir(-dirToChaser, magnitude);
-                if (Math.random() < .5) {
+                if (Sync.random.chance(0.5)) {
                     this.accelerateInDir(dirToChaser + Math.PI / 2, magnitude);
                 } else {
                     this.accelerateInDir(dirToChaser - Math.PI / 2, magnitude);

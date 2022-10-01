@@ -13,6 +13,7 @@ import { lerp } from "../util/MathUtil";
 import { BlobShip } from "../objects/ships/BlobShip";
 import { ObjectContainer } from "./BaseObject";
 import { Game } from "./Game";
+import { Sync } from "../sync/Sync";
 
 export class World implements ObjectContainer {
     
@@ -35,7 +36,7 @@ export class World implements ObjectContainer {
     cameraY = 0;
     cameraZoom = 1;
 
-    cameraTarget: WorldObject;
+    // cameraTarget: WorldObject;
     game: Game;
 
     constructor(width, height) {
@@ -63,13 +64,13 @@ export class World implements ObjectContainer {
         // this.hero = new Hero();
         // this.addObject(this.hero);
 
-        this.addObject(this.cameraTarget = new BlobShip(0x3333cc)); // adding this so the camera has an initial target, but how can we initialize the world with an empty arena?
+        // this.addObject(new BlobShip(0x3333cc)); // adding this so the camera has an initial target, but how can we initialize the world with an empty arena?
         // i guess ideally we want a starting camera dimensions, with nothing on the field, then the ability to add a bunch of objects and only begin the simulation when we click go
 
-        // for (let i = 0; i < 10; i++) {
-        //     this.addObject(new BlobShip(0xcc3333));
-        //     this.addObject(this.cameraTarget = new BlobShip(0x3333cc));
-        // }
+        for (let i = 0; i < 10; i++) {
+            this.addObject(new BlobShip(0xcc3333));
+            this.addObject(new BlobShip(0x3333cc));
+        }
 
     }
 
@@ -91,9 +92,9 @@ export class World implements ObjectContainer {
 
             for (let i = 0; i < nStars; i++) {
                 let s = star.clone();
-                s.x = Math.random() * range - range / 2;
-                s.y = Math.random() * range - range / 2;
-                s.scale.x = s.scale.y = Math.random() * 0.5 + 0.75;
+                s.x = Sync.random.floatRange(-range / 2, range / 2);
+                s.y = Sync.random.floatRange(-range / 2, range / 2);
+                s.scale.x = s.scale.y = Sync.random.floatRange(0.5, 1.5);
                 field.addChild(s);
             }
         }
@@ -116,14 +117,15 @@ export class World implements ObjectContainer {
     }
 
     updateCamera() {
-        if (!this.cameraTarget.isInWorld || Math.random() < 0.002) {
-            this.cameraTarget = this.objects[Math.floor(this.objects.length * Math.random())]
-        }
+        // if (!this.cameraTarget.isInWorld || Sync.random.chance(0.002)) {
+        //     this.cameraTarget = this.objects[Sync.random.int(0, this.objects.length - 1)];
+        // }
 
         // this.cameraX = this.cameraTarget.g.x;
         // this.cameraY = this.cameraTarget.g.y;
 
         let cameraObjects = this.objects.filter(o => o.shouldStayOnCamera());
+        if (cameraObjects.length == 0) return;
 
         let xs = cameraObjects.map(o => o.g.x);
         let ys = cameraObjects.map(o => o.g.y);
@@ -162,7 +164,7 @@ export class World implements ObjectContainer {
         })
     }
 
-    update(delta) {
+    update() {
         // let func = (x, y) => 3 * x;
         // func(3, 4);
 
@@ -177,10 +179,10 @@ export class World implements ObjectContainer {
         this.updateCamera();
         this.updateGameStage();
 
-        Matter.Engine.update(this.engine, 1000 / 60 * delta);
+        Matter.Engine.update(this.engine, 1000 / 60);
 
         this.objects.forEach(obj => {
-            obj.update(delta);
+            obj.update();
         });
     }
 }

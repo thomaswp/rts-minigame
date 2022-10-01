@@ -31,8 +31,8 @@ export class Hero extends WorldObject {
     return this.graphics;
   }
 
-  update(delta: number): void {
-    super.update(delta);
+  update(): void {
+    super.update();
     this.updateGraphics();
   }
 }

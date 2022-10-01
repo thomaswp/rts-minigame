@@ -36,8 +36,8 @@ export abstract class Projectile extends PhysicsObject {
         return argMin(enemies, e => this.distanceTo(e)) as Battler;
     }
 
-    update(delta: number): void {
-        super.update(delta);
+    update(): void {
+        super.update();
         this.updateGraphics();
     }
 }

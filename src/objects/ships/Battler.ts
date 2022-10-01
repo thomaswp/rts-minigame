@@ -1,5 +1,6 @@
 import * as Matter from 'matter-js';
 import { DisplayObject, Graphics } from "pixi.js";
+import { Sync } from '../../sync/Sync';
 import { argMin, removeFrom } from "../../util/MathUtil";
 import { PhysicsObject } from "../PhysicsObject";
 import { Projectile } from "../projectile/Projectile";
@@ -27,9 +28,10 @@ export abstract class Battler extends PhysicsObject {
         this.graphics = new Graphics();
         this.graphics = this.updateGraphics();
         this.team = team;
-
-        this.g.x = 600 * Math.random() - 300; // should we assign positions randomly in the world instead of per battler, and should we try splitting the arena in 2 for each team?
-        this.g.y = 400 * Math.random() - 200;
+        
+        // should we assign positions randomly in the world instead of per battler, and should we try splitting the arena in 2 for each team?
+        this.g.x = Sync.random.floatRange(-300, 300);
+        this.g.y = Sync.random.floatRange(-200, 200);
         this.size = size;
     }
 
@@ -71,15 +73,15 @@ export abstract class Battler extends PhysicsObject {
 
     startToDie() {
         this.dying = true;
-        this.run(delta => {
+        this.run(() => {
             this.g.alpha *= 0.9;
             return this.g.alpha < 0.01;
         }).then(() => this.die());
         return;
     }
 
-    update(delta: number) {
-        super.update(delta);
+    update() {
+        super.update();
         this.updateGraphics();
 
         if (this.dying) {
