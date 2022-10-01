@@ -1,5 +1,6 @@
 import { DisplayObject, Graphics } from "pixi.js";
 import { BlobShip } from "../objects/ships/BlobShip";
+import { Ship } from "../sync/GameSchema";
 import { Sync } from "../sync/Sync";
 import { InterfaceObject } from "./InterfaceObject";
 
@@ -56,11 +57,16 @@ export class Button extends InterfaceObject {
         // console.log(this); // again confirms 'this' is the button, but it's somehow both?
         // console.log(super.constructor.name); //InterfaceObject
         if (this.isOver) {
-            if (Sync.random.boolean()) {
-                this.world.game.world.addObject(new BlobShip(0xcc3333)); // this.world.game.world is not the most intuitive
-            } else {
-                this.world.game.world.addObject(new BlobShip(0x3333cc)); // would look like this.world.game.ui going the other way (a world object accessing a ui object)
-            }
+            let ship = new Ship()
+            ship.type = BlobShip.name;
+            ship.x = Sync.random.floatRange(-300, 300);
+            ship.y = Sync.random.floatRange(-200, 200);
+            Sync.room.send('addShip', ship);
+            // if (Sync.random.boolean()) {
+            //     this.world.game.world.addObject(new BlobShip(0xcc3333)); // this.world.game.world is not the most intuitive
+            // } else {
+            //     this.world.game.world.addObject(new BlobShip(0x3333cc)); // would look like this.world.game.ui going the other way (a world object accessing a ui object)
+            // }
             
         }
         

@@ -1,6 +1,7 @@
 import seedrandom from 'seedrandom'
 import * as Matter from 'matter-js';
 import * as Colyseus from "colyseus.js"
+import { Ship } from './GameSchema';
 
 export class Random {
 
@@ -35,6 +36,9 @@ export class Random {
 export class Sync {
 
     static random: Random;
+    static client: Colyseus.Client;
+    static room: Colyseus.Room<unknown>;
+    static onShipCreated: (ship: Ship) => void;
 
     static init(seed: number) {
         this.random = new Random(seed);
@@ -44,25 +48,29 @@ export class Sync {
 
         var host = window.document.location.host.replace(/:.*/, '');
 
-        var client = new Colyseus.Client(location.protocol.replace("http", "ws") + "//" + host + (location.port ? ':' + location.port : ''));
+        var client = this.client = new Colyseus.Client(location.protocol.replace("http", "ws") + "//" + host + (location.port ? ':' + location.port : ''));
         var room;
         client.joinOrCreate("game_room").then(room_instance => {
-            room = room_instance
+            this.room = room = room_instance
 
             var players = {};
 
             // listen to patches coming from the server
-            room.state.players.onAdd = function (player, sessionId) {
+            room.state.players.onAdd = (player, sessionId) => {
 
-                player.onChange = function (changes) {
+                player.onChange = (changes) => {
                     console.log(changes);
+                }
+
+                player.ships.onAdd = (ship) => {
+                    console.log(ship, this, this.onShipCreated);
+                    if (this.onShipCreated) this.onShipCreated(ship);
                 }
 
                 players[sessionId] = {}; //TODO
             }
 
-            room.state.players.onRemove = function (player, sessionId) {
-                document.body.removeChild(players[sessionId]);
+            room.state.players.onRemove = (player, sessionId) => {
                 delete players[sessionId];
             }
 
