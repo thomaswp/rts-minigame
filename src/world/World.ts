@@ -10,6 +10,7 @@ import * as Matter from 'matter-js';
 import * as PolyDecomp from 'poly-decomp'
 import * as hull from 'hull.js'
 import { lerp } from "../util/MathUtil";
+import { BlobShip } from "../objects/BlobShip";
 
 export class World {
     app: Application;
@@ -66,8 +67,8 @@ export class World {
         // this.addObject(this.hero);
 
         for (let i = 0; i < 10; i++) {
-            this.addObject(new Battler(0xcc3333));
-            this.addObject(this.cameraTarget = new Battler(0x3333cc));
+            this.addObject(new BlobShip(0xcc3333));
+            this.addObject(this.cameraTarget = new BlobShip(0x3333cc));
         }
 
     }

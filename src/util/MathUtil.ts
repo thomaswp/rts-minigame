@@ -16,3 +16,10 @@ export function argMin<T>(array: T[], mapper: (item: T) => number) {
         .reduce((r, a) => (a[0] < r[0] ? a : r))[1];
     return array[index];
 }
+
+export function removeFrom<T>(array: T[], item: T) : boolean {
+    let index = array.indexOf(item);
+    if (index < 0) return false;
+    array.splice(index, 1);
+    return true;
+}

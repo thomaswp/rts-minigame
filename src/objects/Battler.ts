@@ -1,34 +1,24 @@
 import * as Matter from 'matter-js';
 import { DisplayObject, Graphics } from "pixi.js";
-import { argMax, argMin } from "../util/MathUtil";
-import { BaseObject } from "./BaseObject"
+import { argMin, removeFrom } from "../util/MathUtil";
 import { PhysicsObject } from "./PhysicsObject";
 import { Projectile } from "./Projectile";
 
-export class Battler extends PhysicsObject {
+export abstract class Battler extends PhysicsObject {
 
     graphics: Graphics;
     size: number;
-    fireInterval: number = 60 * 2;
-    evasionInterval: number = 60 * 2;
     maxHealth = 10;
     health = this.maxHealth;
-    thrust = 0;
-    turnSpeed = .01;
-    maxFuel = 999999999;
-    fuel = this.maxFuel;
     team: number;
-    target: Battler;
-    chasingMe: BaseObject;
     dying = false;
+    target: Battler;
+    enemiesChasing = [] as Battler[];
     // turn speed
     // fuel regen?
 
     // some sort of basic 'threat' that counts nearby enemies, and if it's high, they move toward nearest ally? or away from nearest enemy? when would that supercede chasing?
 
-    private framesSinceFired = 0;
-    private framesSinceEvaded = 0;
-    
     get dx() { return Math.cos(this.direction); }
     get dy() { return Math.sin(this.direction); }
 
@@ -43,39 +33,9 @@ export class Battler extends PhysicsObject {
         this.size = size;
     }
 
-    createBody(): Matter.Body {
-        let body = Matter.Bodies.circle(this.g.x, this.g.y, this.size);
-        return body;
-    }
+    abstract updateGraphics();
 
-    onAddedToWorld(): void {
-        super.onAddedToWorld();
-        this.updateTarget();
-    }
-
-    updateTarget() {
-        this.target = this.getNearestEnemy();
-        if (this.target instanceof Battler) this.target.chasingMe = this;
-    }
-
-    updateGraphics() {
-        let myShape = this.graphics;
-        myShape.clear();
-        if (!this.dying) {
-            myShape.alpha = 1 - ((this.maxHealth - this.health) / this.maxHealth / 2)
-        }
-        myShape.lineStyle(2, this.team / 2);
-        myShape.beginFill(this.team);
-        myShape.drawCircle(0, 0, this.size);
-        myShape.drawCircle(this.size, 0, 3);
-        myShape.endFill();
-
-        return myShape;
-    }
-
-    shoot() {
-        let bullet = new Projectile(this.team, 90);
-
+    shoot(bullet: Projectile) {
         this.world.addObject(bullet);
         
         let dx = this.dx;
@@ -87,18 +47,21 @@ export class Battler extends PhysicsObject {
         bullet.vy = this.vy + dy * 10;
     }
 
-    applyThrust() {
-        if (this.thrust > this.fuel) this.thrust = 0;
-        let dx = this.dx;
-        let dy = this.dy;
-        this.vx += dx * this.thrust / 60;
-        this.vy += dy * this.thrust / 60;
-        this.fuel -= this.thrust;
+    updateTarget() {
+        if (this.target != null) {
+            removeFrom(this.target.enemiesChasing, this);
+        }
+        this.setTarget(this.getNearestEnemy());
     }
 
-    getNearestEnemy() {
-        let enemies = this.world.objects
-            .filter(o => o instanceof Battler && o.team != this.team);
+    setTarget(target: Battler) {
+        this.target = target;
+        if (this.target) this.target.enemiesChasing.push(this);
+    }
+
+    getNearestEnemy(enemies?: Battler[]) {
+        if (!enemies) enemies = this.world.objects
+            .filter(o => o instanceof Battler && o.team != this.team) as Battler[];
         return argMin(enemies, e => this.distanceTo(e)) as Battler;
     }
 
@@ -106,109 +69,31 @@ export class Battler extends PhysicsObject {
         return this.graphics;
     }
 
-    update(delta: number): void {
-        super.update(delta);
+    startToDie() {
+        this.dying = true;
+        this.run(delta => {
+            this.g.alpha *= 0.9;
+            return this.g.alpha < 0.01;
+        }).then(() => this.die());
+        return;
+    }
 
-        this.applyThrust();
+    update(delta: number) {
         super.update(delta);
         this.updateGraphics();
 
-        if (this.dying) return;
+        if (this.dying) 
 
-        this.framesSinceFired += delta;
-        this.framesSinceEvaded += delta;
-        
-        if (this.health <= 0) { //Math.random() < 0.0003
-            this.dying = true;
-            this.run(delta => {
-                this.g.alpha *= 0.9;
-                return this.g.alpha < 0.01;
-            }).then(() => this.die());
+        if (!this.target || !this.target.isInWorld) {
+            this.updateTarget();
+        }
+
+        this.enemiesChasing = 
+            this.enemiesChasing.filter(e => e && e.isInWorld);
+
+        if (this.health <= 0) {
+            this.startToDie();
             return;
-        }
-        
-        if (!this.target) {
-            this.updateTarget();
-            return;
-        }
-
-        if (!this.target.isInWorld) {
-            this.updateTarget();
-        }
-        if (this.chasingMe && !this.chasingMe.isInWorld) {
-            this.chasingMe = null;
-        }
-
-        let targetX = this.target.g.x;
-        let targetY = this.target.g.y;
-        targetX += Math.cos(-this.target.direction) * 0;
-        targetY += Math.sin(-this.target.direction) * 0;
-
-        let dirToTarget = this.directionTo(targetX, targetY);
-        let disToTarget = this.distanceToXY(targetX, targetY);
-
-        let oldTarget = this.target;
-        if (disToTarget > 300) {
-            this.updateTarget();
-            if (oldTarget != this.target) return;
-        }
-
-        let diff = this.direction - dirToTarget;
-        if (diff < 0) diff += Math.PI * 2;
-        let rotationDir;
-        if (diff > 0 && diff < Math.PI) {
-            rotationDir = -3 * delta;
-        } else {
-            rotationDir = 3 * delta;
-        }
-        this.direction += rotationDir * this.turnSpeed;
-
-        
-        if (this.fuel < this.maxFuel) {
-            this.fuel += 1;
-        }
-
-        // moving relative to target
-        if (this.fuel > this.maxFuel / 2) {
-            if (disToTarget > 200) {
-                // this.accelerateInDir(dirToTarget, 0.1);
-                this.thrust = 5;
-            } else if (disToTarget < 150 && disToTarget >= 100) {
-                this.thrust *= .98;
-            } else if (disToTarget < 100) {
-                this.thrust = -1;
-            }
-            // else if (this.chasingMe) {
-            //     let distanceToChaser = this.distanceTo(this.chasingMe);
-            //     if (distanceToChaser < 300) {
-            //         let dirToChaser = this.directionTo(this.chasingMe.g.x, this.chasingMe.g.y);
-            //         this.accelerateInDir(-dirToChaser + Math.random(), 0.1);
-            //         // this.thrust = 5;
-            //     }
-            // }
-        }
-
-        // moving relative to chaser, i.e. 'evasion'
-        if (this.chasingMe) {
-            let distanceToChaser = this.distanceTo(this.chasingMe);
-            if (distanceToChaser <= 350 && this.framesSinceEvaded >= this.evasionInterval) {
-                if (Math.random() > .25) return; // just a temporary hack so they don't all 'evade' for the first time at the exact same instant
-                let dirToChaser = this.directionTo(this.chasingMe.g.x, this.chasingMe.g.y);
-                let magnitude = (350 - distanceToChaser) / 200; // evade harder if the enemy is closer, may want this to be nonlinear, also not sure if i like it logically
-                this.accelerateInDir(-dirToChaser, magnitude);
-                if (Math.random() < .5) {
-                    this.accelerateInDir(dirToChaser + Math.PI / 2, magnitude);
-                } else {
-                    this.accelerateInDir(dirToChaser - Math.PI / 2, magnitude);
-                }
-                // console.log('run!')
-                this.framesSinceEvaded = 0;
-            }
-        }
-
-        if (this.framesSinceFired >= this.fireInterval && disToTarget <= 200) {
-            this.shoot();
-            this.framesSinceFired = 0;
         }
     }
 
