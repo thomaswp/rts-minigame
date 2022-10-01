@@ -1,6 +1,7 @@
 import { Battler } from "./Battler";
 import * as Matter from 'matter-js';
 import { Projectile } from "../projectile/Projectile";
+import { Bullet } from "../projectile/Bullet";
 
 export class BlobShip extends Battler {
      
@@ -39,7 +40,7 @@ export class BlobShip extends Battler {
     }
 
     shootBullet() {
-        let bullet = new Projectile(this.team, 90);
+        let bullet = new Bullet(this.team, 90);
         this.shoot(bullet);
     }
 

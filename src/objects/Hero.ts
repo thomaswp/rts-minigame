@@ -12,7 +12,7 @@ export class Hero extends BaseObject {
     this.g.y = 50;
     this.updateGraphics();
     this.g.interactive = true;
-    this.g.on("pointerdown", () => this.shoot());
+    // this.g.on("pointerdown", () => this.shoot());
   }
 
   updateGraphics() {
@@ -25,15 +25,6 @@ export class Hero extends BaseObject {
     // myShape.beginFill(0x0000ff);
     // myShape.drawCircle(15, 15, (this.elapsedFrames / 60) % 5);
     // myShape.endFill();
-  }
-
-  shoot() {
-    let bullet = new Projectile(0x3333cc, 90);
-    this.world.addObject(bullet);
-    bullet.g.x = this.g.x + this.g.getBounds().width / 2;
-    bullet.g.y = this.g.y;
-    bullet.vy = 0;
-    bullet.vx = 10;
   }
 
   getDisplayObject(): DisplayObject {
