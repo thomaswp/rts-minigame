@@ -1,13 +1,13 @@
 import { DisplayObject } from "pixi.js";
 import { Action, Updatable, UpdateFunction, Updater } from "../util/Action";
-import { World } from "../world/World";
+import { World } from "./World";
 
 export interface ObjectContainer {
-    objects: BObject<ObjectContainer>[];
-    removeObject(object: BObject<ObjectContainer>): boolean;
+    objects: BaseObject<ObjectContainer>[];
+    removeObject(object: BaseObject<ObjectContainer>): boolean;
 }
 
-export abstract class BObject<WorldType extends ObjectContainer> implements Updater {
+export abstract class BaseObject<WorldType extends ObjectContainer> implements Updater {
 
     elapsedFrames = 0;
     world: WorldType;

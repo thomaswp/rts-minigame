@@ -1,9 +1,9 @@
 import { DisplayObject } from "pixi.js";
 import { Action, Updatable, UpdateFunction, Updater } from "../util/Action";
-import { BObject } from "../world/BObject";
+import { BaseObject } from "../world/BaseObject";
 import { World } from "../world/World";
 
-export abstract class BaseObject extends BObject<World> implements Updater {
+export abstract class WorldObject extends BaseObject<World> implements Updater {
 
     elapsedFrames = 0;
     world: World;
@@ -31,7 +31,7 @@ export abstract class BaseObject extends BObject<World> implements Updater {
         );
     }
 
-    distanceTo(obj: BaseObject) {
+    distanceTo(obj: WorldObject) {
         return this.distanceToXY(obj.g.x, obj.g.y);
     }
 }

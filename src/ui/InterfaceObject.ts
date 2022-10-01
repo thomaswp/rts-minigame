@@ -1,10 +1,10 @@
 import { DisplayObject } from "pixi.js";
-import { BaseObject } from "../objects/BaseObject";
+import { WorldObject } from "../objects/WorldObject";
 import { Updatable } from "../util/Action";
-import { BObject } from "../world/BObject";
+import { BaseObject } from "../world/BaseObject";
 import { UI } from "./UI";
 
-export abstract class InterfaceObject extends BObject<UI> {
+export abstract class InterfaceObject extends BaseObject<UI> {
 
     update(delta: number): void {
         

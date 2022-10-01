@@ -1,5 +1,5 @@
 import { Application, ArrayResource, Container, Graphics, Point, Runner } from "pixi.js";
-import { BaseObject } from "../objects/BaseObject";
+import { WorldObject } from "../objects/WorldObject";
 import { Battler } from "../objects/ships/Battler";
 import { Hero } from "../objects/Hero";
 import { PhysicsObject } from "../objects/PhysicsObject";
@@ -11,7 +11,7 @@ import * as PolyDecomp from 'poly-decomp'
 import * as hull from 'hull.js'
 import { lerp } from "../util/MathUtil";
 import { BlobShip } from "../objects/ships/BlobShip";
-import { ObjectContainer } from "./BObject";
+import { ObjectContainer } from "./BaseObject";
 
 export class World implements ObjectContainer {
     
@@ -22,7 +22,7 @@ export class World implements ObjectContainer {
 
     gravity = 0;
 
-    objects = [] as BaseObject[];
+    objects = [] as WorldObject[];
 
     mainContainer: Container;
     gameStage: Container;
@@ -34,7 +34,7 @@ export class World implements ObjectContainer {
     cameraY = 0;
     cameraZoom = 1;
 
-    cameraTarget: BaseObject;
+    cameraTarget: WorldObject;
 
     constructor(width, height) {
         this.width = width;
@@ -94,14 +94,14 @@ export class World implements ObjectContainer {
         }
     }
 
-    addObject(obj: BaseObject) {
+    addObject(obj: WorldObject) {
         obj.world = this;
         this.objects.push(obj);
         this.gameStage.addChild(obj.g);
         obj.onAddedToWorld();
     }
 
-    removeObject(obj: BaseObject) {
+    removeObject(obj: WorldObject) {
         let index = this.objects.indexOf(obj);
         if (index === -1) return false;
         this.objects.splice(index, 1);

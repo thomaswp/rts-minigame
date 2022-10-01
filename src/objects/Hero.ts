@@ -1,8 +1,8 @@
 import { DisplayObject, Graphics } from "pixi.js";
-import { BaseObject } from "./BaseObject";
+import { WorldObject } from "./WorldObject";
 import { Projectile } from "./projectile/Projectile";
 
-export class Hero extends BaseObject {
+export class Hero extends WorldObject {
   graphics: Graphics;
 
   constructor() {

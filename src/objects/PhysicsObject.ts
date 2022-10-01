@@ -1,11 +1,11 @@
-import { BaseObject } from "./BaseObject";
+import { WorldObject } from "./WorldObject";
 import * as Matter from 'matter-js';
 
 function v(x: number, y: number) {
     return Matter.Vector.create(x, y);
 }
 
-export abstract class PhysicsObject extends BaseObject {
+export abstract class PhysicsObject extends WorldObject {
     
     get x() { return this.body.position.x; }
     get y() { return this.body.position.y; }

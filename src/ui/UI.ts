@@ -1,7 +1,7 @@
 import { Container } from "pixi.js";
-import { BaseObject } from "../objects/BaseObject";
+import { WorldObject } from "../objects/WorldObject";
 import { removeFrom } from "../util/MathUtil";
-import { BObject, ObjectContainer } from "../world/BObject";
+import { BaseObject, ObjectContainer } from "../world/BaseObject";
 import { InterfaceObject } from "./InterfaceObject";
 
 export class UI implements ObjectContainer {
