@@ -65,3 +65,22 @@ export class IncreaseFireRate extends Buff {
     }
 
 }
+
+export class HealShipHeal extends Buff {
+    cooldown = 0;
+    healInterval = 1*60;
+    healAmount = 1;
+    duration = 10 * 60;
+
+    update(properties: BaseProperties) {
+        super.update(properties);
+        this. cooldown += 1;
+        if (this.cooldown >= this.healInterval) {
+            properties.currentHealth += this.healAmount;
+            if (properties.currentHealth > this.ship.stats.maxHealth) {
+                properties.currentHealth = this.ship.stats.maxHealth;
+            }
+        }
+        return properties;
+    }
+}
