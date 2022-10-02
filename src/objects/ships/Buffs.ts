@@ -15,11 +15,17 @@ export abstract class Buff {
     isApplied = false;
     duration: number;
 
+    remove(properties) {
+        this.ship.removeBuff(this);
+        // can add specific removal logic to particular buffs if necessary
+        return properties;
+    }
+
     update(properties: BaseProperties) {
         this.elapsedFrames += 1;
         if (this.elapsedFrames >= this.duration) {
-            this.ship.removeBuff(this);
-            return;
+            properties = this.remove(properties);
+            return properties;
         }
 
         return properties; // i want the elapsed frames logic, then just enforce that Buff.update needs to return a BaseProperties object
@@ -29,11 +35,21 @@ export abstract class Buff {
 }
 
 export class IncreaseHealth extends Buff {
-    duration = 2 * 60;
+    duration = 2 * 60 + 1;
+    // adding 1 because of the ordering of health removal when removing this one as opposed to the fire rate one; need to fix
+
+    remove(properties) {
+        let currentHealthProp = this.ship.stats.currentHealth / this.ship.stats.maxHealth
+        properties.maxHealth -= 50;
+        properties.currentHealth = currentHealthProp * properties.maxHealth;
+        super.remove(properties);
+    }
 
     update(properties: BaseProperties) {
-        super.update(properties);
-        properties.maxHealth += 50;
+        super.update(properties);        
+        let currentHealthProp = this.ship.stats.currentHealth / this.ship.stats.maxHealth
+        properties.maxHealth += 50;        
+        properties.currentHealth = currentHealthProp * properties.maxHealth
         return properties;
     }
 

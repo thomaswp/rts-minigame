@@ -85,8 +85,10 @@ export class World implements ObjectContainer {
         Sync.room.state.players.forEach(p => {
             p.ships.forEach(ship => {
                 var bs = new BlobShip(ship.team);
+
                 bs.addBuff(new IncreaseHealth());
                 bs.addBuff(new IncreaseFireRate());
+                
                 bs.g.x = ship.x;
                 bs.g.y = ship.y;
                 this.addObject(bs);

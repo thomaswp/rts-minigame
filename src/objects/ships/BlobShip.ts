@@ -16,6 +16,8 @@ export class BlobShip extends Battler {
     private framesSinceFired = 0;
     private framesSinceEvaded = 0;
 
+    
+
     // just testing this for now, still need to actually replace any this.property
     // everywhere with this.stats.property
     constructor(team) {
@@ -39,7 +41,7 @@ export class BlobShip extends Battler {
         let myShape = this.graphics;
         myShape.clear();
         if (!this.dying) {
-            myShape.alpha = 1 - ((this.maxHealth - this.health) / this.maxHealth / 2)
+            myShape.alpha = 1 - ((this.stats.maxHealth - this.stats.currentHealth) / this.stats.maxHealth / 2)
         }
         myShape.lineStyle(2, this.team / 2);
         myShape.beginFill(this.team);

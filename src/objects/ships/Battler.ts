@@ -33,10 +33,8 @@ export abstract class Battler extends PhysicsObject {
     constructor(team: number, size = 15) {
         super();
         
-        // this.properties = new ShipProperties(this.startingProperties);
-        // every battler will do this, but for now i need to have it in each child
-        // because startingProperties doesn't exist yet when battler's constructor
-        // is called, so properties will be undefined
+        this.startingProperties = new BaseProperties();
+        this.properties = new ShipProperties(this.startingProperties);
         
         this.graphics = new Graphics();
         this.graphics = this.updateGraphics();
@@ -103,8 +101,7 @@ export abstract class Battler extends PhysicsObject {
     }
 
     update() {
-        console.log('maxHealth: ', this.stats.maxHealth);
-        console.log('fireInterval: ', this.stats.fireInterval);
+        // console.log(this.stats.currentHealth, '/', this.stats.maxHealth, this.stats.fireInterval);
         super.update();
         this.updateGraphics();
         this.properties.update();
@@ -120,7 +117,7 @@ export abstract class Battler extends PhysicsObject {
         this.enemiesChasing = 
             this.enemiesChasing.filter(e => e && e.isInWorld);
 
-        if (this.health <= 0) {
+        if (this.properties.currentProperties.currentHealth <= 0) {
             this.startToDie();
             return;
         }
