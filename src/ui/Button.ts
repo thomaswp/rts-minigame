@@ -1,7 +1,7 @@
 import { DisplayObject, Graphics } from "pixi.js";
 import { BlobShip } from "../objects/ships/BlobShip";
-import { Ship } from "../sync/GameSchema";
-import { Sync } from "../sync/Sync";
+import { Ship } from "../net/common/GameSchema";
+import { Sync } from "../net/client/Sync";
 import { InterfaceObject } from "./InterfaceObject";
 
 export abstract class Button extends InterfaceObject {

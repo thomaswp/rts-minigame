@@ -1,5 +1,5 @@
 import { Application } from "pixi.js";
-import { Sync } from "../sync/Sync";
+import { Sync } from "../net/client/Sync";
 import { UI } from "../ui/UI";
 import { World } from "./World";
 

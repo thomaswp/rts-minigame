@@ -1,9 +1,9 @@
 import { Container, DisplayObject } from "pixi.js";
 import { InterfaceObject } from "./InterfaceObject";
 import * as Colyseus from "colyseus.js"
-import { Ship, State } from "../sync/GameSchema";
+import { Ship, GameState } from "../net/common/GameSchema";
 import { ShipIcon } from "./ShipIcon";
-import { Sync } from "../sync/Sync";
+import { Sync } from "../net/client/Sync";
 import { BaseObject, ObjectContainer } from "../world/BaseObject";
 import { removeFrom } from "../util/MathUtil";
 import { UI } from "./UI";
@@ -20,10 +20,8 @@ export class ShipDisplay extends InterfaceObject implements ObjectContainer {
     constructor() {
         super();
         this.container = new Container();
-        Sync.listeners.push({
-            init: room => this.addListeners(room),
-        });
-        // TODO: get width/height
+        Sync.listeners.push(() => this.addListeners());
+        // TODO: get width/heights
         this.g.x = 300;
         this.g.y = 200;
     }
@@ -43,9 +41,10 @@ export class ShipDisplay extends InterfaceObject implements ObjectContainer {
         this.container.addChild(icon.g);
     }
 
-    addListeners(room: Colyseus.Room<State>) {
+    addListeners() {
+        let state = Sync.state;
         // listen to patches coming from the server
-        room.state.players.onAdd = (player, sessionId) => {
+        state.players.onAdd = (player, sessionId) => {
             console.log("player", player);
             player.ships.onAdd = (ship) => {
                 console.log(ship);
@@ -53,7 +52,7 @@ export class ShipDisplay extends InterfaceObject implements ObjectContainer {
             }
         }
 
-        room.state.players.onRemove = (player, sessionId) => {
+        state.players.onRemove = (player, sessionId) => {
             // TODO
         }
     }

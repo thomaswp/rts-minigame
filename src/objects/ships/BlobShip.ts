@@ -2,7 +2,7 @@ import { Battler } from "./Battler";
 import * as Matter from 'matter-js';
 import { Projectile } from "../projectile/Projectile";
 import { Bullet } from "../projectile/Bullet";
-import { Sync } from "../../sync/Sync";
+import { Sync } from "../../net/client/Sync";
 
 export class BlobShip extends Battler {
      

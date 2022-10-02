@@ -13,7 +13,7 @@ import { lerp } from "../util/MathUtil";
 import { BlobShip } from "../objects/ships/BlobShip";
 import { ObjectContainer } from "./BaseObject";
 import { Game } from "./Game";
-import { Sync } from "../sync/Sync";
+import { Sync } from "../net/client/Sync";
 
 export class World implements ObjectContainer {
     
@@ -72,16 +72,12 @@ export class World implements ObjectContainer {
         //     this.addObject(new BlobShip(0x3333cc));
         // }
 
-        Sync.listeners.push({
-            roundStarted: () => {
-                this.startRound();
-            }
-        });
+        Sync.messenger.roundStarted.on(() => this.startRound());
 
     }
 
     startRound() {
-        Sync.room.state.players.forEach(p => {
+        Sync.state.players.forEach(p => {
             p.ships.forEach(ship => {
                 var bs = new BlobShip(ship.team);
                 bs.g.x = ship.x;

@@ -1,7 +1,10 @@
 import seedrandom from 'seedrandom'
 import * as Matter from 'matter-js';
 import * as Colyseus from "colyseus.js"
-import { Player, Ship, State } from './GameSchema';
+import { GameState } from '../common/GameSchema';
+import { Messenger, Sender } from '../common/Messenger';
+import { GameLogic } from '../common/GameLogic';
+import { ClientOnlySender } from './ClientOnlySender';
 
 export class Random {
 
@@ -32,20 +35,14 @@ export class Random {
     }
 }
 
-export interface ServerListener {
-    init?: (room: Colyseus.Room<State>) => void;
-    roundStarted?: () => void;
-} 
-
 export class Sync {
 
     static random: Random;
     static client: Colyseus.Client;
-    static room: Colyseus.Room<State>;
-    static onShipCreated: (ship: Ship) => void;
+    static state: GameState;
+    static messenger = new Messenger();
 
-    static listeners = [] as ServerListener[]
-
+    static listeners = [] as (() => void)[];
 
     static init(seed: number) {
         this.random = new Random(seed);
@@ -58,21 +55,32 @@ export class Sync {
 
         this.client = new Colyseus.Client(endpoint);
         this.client.joinOrCreate("game_room").then(room_instance => {
-            this.room = room_instance as Colyseus.Room<State>;
-            this.listeners.forEach(l => {
-                if (l.init) l.init(this.room)
+            this.state = room_instance.state as GameState;
+            this.messenger.setSender(room_instance);
+
+            this.messenger.roundStarted.on(() => {
+                console.log(this.state.seed);
+                this.random = new Random(this.state.seed);
+                Matter.Common['_seed'] = this.random.float();
             });
 
-            // TODO: Use constant message names
-            this.room.onMessage("startRound", () => {
-                let state = this.room.state;
-                console.log(state.seed);
-                this.random = new Random(this.room.state.seed);
-                Matter.Common['_seed'] = this.random.float();
-                this.listeners.forEach(l => {
-                    if (l.roundStarted) l.roundStarted()
-                });
-            });
+            
+            this.listeners.forEach(l => l());
+        }).catch(e => {
+            console.error('Cannot connect to websocket!', e);
+            return; // Client-only mode does not work yet! TODO!
+            console.error('Running in client mode.');
+            let id = 'localplayer';
+            this.state = new GameState();
+            let logic = new GameLogic(this.messenger, this.state);
+            logic.currentClientID = id;
+            let writeState = new GameState();
+            let sender = new ClientOnlySender(writeState, this.state);
+            this.messenger.setSender(sender);
+            this.listeners.forEach(l => l());
+
+            writeState.createPlayer(id);
+            sender.updateState();
         });
     }
 

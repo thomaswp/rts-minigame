@@ -1,7 +1,7 @@
 import { DisplayObject, Graphics } from "pixi.js";
 import { BlobShip } from "../objects/ships/BlobShip";
-import { Ship } from "../sync/GameSchema";
-import { Sync } from "../sync/Sync";
+import { Ship } from "../net/common/GameSchema";
+import { Sync } from "../net/client/Sync";
 import { Button } from "./Button";
 import { InterfaceObject } from "./InterfaceObject";
 
@@ -12,7 +12,7 @@ export class StartGameButton extends Button {
     }
     
     onPressed(): void {
-        Sync.room.send('startRound');
+        Sync.messenger.roundStarted.send();
     }
 
     updateGraphics() {

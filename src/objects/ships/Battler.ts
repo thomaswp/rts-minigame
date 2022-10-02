@@ -1,6 +1,6 @@
 import * as Matter from 'matter-js';
 import { DisplayObject, Graphics } from "pixi.js";
-import { Sync } from '../../sync/Sync';
+import { Sync } from '../../net/client/Sync';
 import { argMin, removeFrom } from "../../util/MathUtil";
 import { PhysicsObject } from "../PhysicsObject";
 import { Projectile } from "../projectile/Projectile";

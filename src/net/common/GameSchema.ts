@@ -12,7 +12,7 @@ export class Player extends Schema {
     @type([Ship]) ships = new ArraySchema<Ship>();
 }
 
-export class State extends Schema {
+export class GameState extends Schema {
     @type({ map: Player })
     players = new MapSchema<Player>();
 

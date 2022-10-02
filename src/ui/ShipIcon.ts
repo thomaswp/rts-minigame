@@ -1,7 +1,5 @@
 import { DisplayObject, Graphics } from "pixi.js";
-import { BlobShip } from "../objects/ships/BlobShip";
-import { Ship } from "../sync/GameSchema";
-import { Sync } from "../sync/Sync";
+import { Ship } from "../net/common/GameSchema";
 import { InterfaceObject } from "./InterfaceObject";
 
 export class ShipIcon extends InterfaceObject {

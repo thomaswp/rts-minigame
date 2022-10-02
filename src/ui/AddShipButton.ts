@@ -1,7 +1,7 @@
 import { DisplayObject, Graphics } from "pixi.js";
 import { BlobShip } from "../objects/ships/BlobShip";
-import { Ship } from "../sync/GameSchema";
-import { Sync } from "../sync/Sync";
+import { Ship } from "../net/common/GameSchema";
+import { Sync } from "../net/client/Sync";
 import { Button } from "./Button";
 import { InterfaceObject } from "./InterfaceObject";
 
@@ -22,7 +22,7 @@ export class AddShipButton extends Button {
         ship.x = Sync.random.floatRange(-300, 300);
         ship.y = Sync.random.floatRange(-200, 200);
         ship.team = Sync.random.boolean() ? 0xcc3333 : 0x3333cc;
-        Sync.room.send('addShip', ship);
+        Sync.messenger.addShip.send({ship});
     }
 
     updateGraphics() {

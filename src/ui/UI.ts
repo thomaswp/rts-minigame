@@ -1,6 +1,6 @@
 import { Container } from "pixi.js";
 import { WorldObject } from "../objects/WorldObject";
-import { Sync } from "../sync/Sync";
+import { Sync } from "../net/client/Sync";
 import { removeFrom } from "../util/MathUtil";
 import { BaseObject, ObjectContainer } from "../world/BaseObject";
 import { Game } from "../world/Game";
@@ -31,10 +31,10 @@ export class UI implements ObjectContainer {
 
         this.addObject(new ShipDisplay());
 
-        Sync.listeners.push({
-            roundStarted: () => {
+        Sync.listeners.push(() => {
+            Sync.messenger.roundStarted.on(() => {
                 this.mainContainer.visible = false;
-            }
+            });
         });
     }
 
