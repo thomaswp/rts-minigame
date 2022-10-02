@@ -117,7 +117,7 @@ export abstract class Battler extends PhysicsObject {
         this.enemiesChasing = 
             this.enemiesChasing.filter(e => e && e.isInWorld);
 
-        if (this.properties.currentProperties.currentHealth <= 0) {
+        if (this.stats.currentHealth <= 0) {
             this.startToDie();
             return;
         }
