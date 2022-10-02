@@ -14,7 +14,7 @@ export class Game {
     constructor(app: Application) {
         this.app = app;
 
-        Sync.init(12345);
+        Sync.init(Math.random());
 
         // Add a ticker callback to move the sprite back and forth
         this.world = new World(app.view.width, app.view.height);

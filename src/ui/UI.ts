@@ -1,10 +1,14 @@
 import { Container } from "pixi.js";
 import { WorldObject } from "../objects/WorldObject";
+import { Sync } from "../sync/Sync";
 import { removeFrom } from "../util/MathUtil";
 import { BaseObject, ObjectContainer } from "../world/BaseObject";
 import { Game } from "../world/Game";
+import { AddShipButton } from "./AddShipButton";
 import { Button } from "./Button";
 import { InterfaceObject } from "./InterfaceObject";
+import { ShipDisplay } from "./ShipDisplay";
+import { StartGameButton } from "./StartGameButton";
 
 export class UI implements ObjectContainer {
     mainContainer: Container;
@@ -15,10 +19,23 @@ export class UI implements ObjectContainer {
     constructor() {
         this.mainContainer = new Container();
 
-        let button = new Button(30, 0xFF00FF);
+        let button = new AddShipButton(30, 0xFF00FF);
         button.g.x = 50;
         button.g.y = 50;
         this.addObject(button);
+
+        let startButton = new StartGameButton();
+        startButton.g.x = 50;
+        startButton.g.y = 140;
+        this.addObject(startButton);
+
+        this.addObject(new ShipDisplay());
+
+        Sync.listeners.push({
+            roundStarted: () => {
+                this.mainContainer.visible = false;
+            }
+        });
     }
 
     removeObject(object: InterfaceObject): boolean {

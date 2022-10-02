@@ -1,5 +1,5 @@
 import { Room, Client } from "colyseus";
-import { State } from "./GameSchema";
+import { State } from "../sync/GameSchema";
 
 export class GameRoom extends Room<State> {
     maxClients = 4;
@@ -10,8 +10,15 @@ export class GameRoom extends Room<State> {
         this.setState(new State());
 
         this.onMessage("addShip", (client, data) => {
-            console.log("StateHandlerRoom received message from", client.sessionId, ":", data);
+            console.log("Room received message from", client.sessionId, ":", data);
             this.state.addShip(client.sessionId, data);
+        });
+
+        this.onMessage("startRound", (client, data) => {
+            console.log("Room received message from", client.sessionId, ":", data);
+            this.state.roundNumber++;
+            this.state.seed = Math.random();
+            this.clients.forEach(c => c.send("startRound"));
         });
     }
 
@@ -20,7 +27,6 @@ export class GameRoom extends Room<State> {
     }
 
     onJoin (client: Client) {
-        client.send("hello", "world");
         this.state.createPlayer(client.sessionId);
     }
 

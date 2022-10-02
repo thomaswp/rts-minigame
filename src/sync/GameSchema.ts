@@ -4,6 +4,7 @@ export class Ship extends Schema {
     @type("string") type: string;
     @type("number") x: number;
     @type("number") y: number;
+    @type("number") team: number;
 }
 
 export class Player extends Schema {
@@ -14,6 +15,9 @@ export class Player extends Schema {
 export class State extends Schema {
     @type({ map: Player })
     players = new MapSchema<Player>();
+
+    @type("number") roundNumber = 0;
+    @type("number") seed = 0;
 
     createPlayer(sessionId: string) {
         this.players.set(sessionId, new Player());
@@ -26,7 +30,6 @@ export class State extends Schema {
     addShip(sessionId: string, data: Ship) {
         let player = this.players.get(sessionId);
         if (!player) return;
-        console.log("adding", data);
         player.ships.push(Object.assign(new Ship(), data));
     };
 }

@@ -72,14 +72,23 @@ export class World implements ObjectContainer {
         //     this.addObject(new BlobShip(0x3333cc));
         // }
 
-        Sync.onShipCreated = ship => {
-            console.log("!!", ship);
-            var bs = new BlobShip(0xcc3333);
-            bs.g.x = ship.x;
-            bs.g.y = ship.y;
-            this.addObject(bs);
-        };
+        Sync.listeners.push({
+            roundStarted: () => {
+                this.startRound();
+            }
+        });
 
+    }
+
+    startRound() {
+        Sync.room.state.players.forEach(p => {
+            p.ships.forEach(ship => {
+                var bs = new BlobShip(ship.team);
+                bs.g.x = ship.x;
+                bs.g.y = ship.y;
+                this.addObject(bs);
+            });
+        });
     }
 
     createBackground() {

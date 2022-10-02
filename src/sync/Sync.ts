@@ -1,14 +1,13 @@
 import seedrandom from 'seedrandom'
 import * as Matter from 'matter-js';
 import * as Colyseus from "colyseus.js"
-import { Ship } from './GameSchema';
+import { Player, Ship, State } from './GameSchema';
 
 export class Random {
 
     private rng: () => number;
 
     constructor(seed: number) {
-        console.log(seedrandom);
         this.rng = seedrandom(seed);
     }
 
@@ -33,50 +32,46 @@ export class Random {
     }
 }
 
+export interface ServerListener {
+    init?: (room: Colyseus.Room<State>) => void;
+    roundStarted?: () => void;
+} 
+
 export class Sync {
 
     static random: Random;
     static client: Colyseus.Client;
-    static room: Colyseus.Room<unknown>;
+    static room: Colyseus.Room<State>;
     static onShipCreated: (ship: Ship) => void;
+
+    static listeners = [] as ServerListener[]
+
 
     static init(seed: number) {
         this.random = new Random(seed);
-        Matter.Common['_seed'] = this.random.float();
 
         // console.log(this.random.float(), this.random.int(0, 100), this.random.boolean());
 
-        var host = window.document.location.host.replace(/:.*/, '');
+        const host = window.document.location.host.replace(/:.*/, '');
+        const endpoint = location.protocol.replace("http", "ws") + "//" + host + 
+            (location.port ? ':' + location.port : '');
 
-        var client = this.client = new Colyseus.Client(location.protocol.replace("http", "ws") + "//" + host + (location.port ? ':' + location.port : ''));
-        var room;
-        client.joinOrCreate("game_room").then(room_instance => {
-            this.room = room = room_instance
+        this.client = new Colyseus.Client(endpoint);
+        this.client.joinOrCreate("game_room").then(room_instance => {
+            this.room = room_instance as Colyseus.Room<State>;
+            this.listeners.forEach(l => {
+                if (l.init) l.init(this.room)
+            });
 
-            var players = {};
-
-            // listen to patches coming from the server
-            room.state.players.onAdd = (player, sessionId) => {
-
-                player.onChange = (changes) => {
-                    console.log(changes);
-                }
-
-                player.ships.onAdd = (ship) => {
-                    console.log(ship, this, this.onShipCreated);
-                    if (this.onShipCreated) this.onShipCreated(ship);
-                }
-
-                players[sessionId] = {}; //TODO
-            }
-
-            room.state.players.onRemove = (player, sessionId) => {
-                delete players[sessionId];
-            }
-
-            
-            room.onMessage("hello", (message) => {
-                console.log(message);
+            // TODO: Use constant message names
+            this.room.onMessage("startRound", () => {
+                let state = this.room.state;
+                console.log(state.seed);
+                this.random = new Random(this.room.state.seed);
+                Matter.Common['_seed'] = this.random.float();
+                this.listeners.forEach(l => {
+                    if (l.roundStarted) l.roundStarted()
+                });
             });
         });
     }

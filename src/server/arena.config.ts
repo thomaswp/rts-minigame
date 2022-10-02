@@ -1,6 +1,6 @@
 import Arena from "@colyseus/arena";
 import { monitor } from "@colyseus/monitor";
-import { GameRoom } from "./sync/GameRoom";
+import { GameRoom } from "./GameRoom";
 import express from 'express';
 import path from 'path';
 
@@ -18,8 +18,7 @@ export default Arena({
     },
 
     initializeExpress: (app) => {
-        app.use('/', express.static(path.join(__dirname, "../static")));
-        console.log(path.join(__dirname, "../static"));
+        app.use('/', express.static(path.join(__dirname, "../../static")));
 
         /**
          * Bind your custom express routes here:
