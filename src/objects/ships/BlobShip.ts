@@ -2,6 +2,7 @@ import { Battler } from "./Battler";
 import * as Matter from 'matter-js';
 import { Projectile } from "../projectile/Projectile";
 import { Bullet } from "../projectile/Bullet";
+import { BaseProperties, ShipProperties } from "./ShipProperties";
 import { Sync } from "../../net/client/Sync";
 
 export class BlobShip extends Battler {
@@ -14,6 +15,17 @@ export class BlobShip extends Battler {
     fuel = this.maxFuel;
     private framesSinceFired = 0;
     private framesSinceEvaded = 0;
+
+    
+
+    // just testing this for now, still need to actually replace any this.property
+    // everywhere with this.stats.property
+    constructor(team) {
+        super(team);
+        this.startingProperties = new BaseProperties(10, .01, 999999999, 1, 1, 1, 60*2, 60*2, 1);
+        this.properties = new ShipProperties(this.startingProperties);
+    }
+
 
     createBody(): Matter.Body {
         let body = Matter.Bodies.circle(this.g.x, this.g.y, this.size);
@@ -29,7 +41,7 @@ export class BlobShip extends Battler {
         let myShape = this.graphics;
         myShape.clear();
         if (!this.dying) {
-            myShape.alpha = 1 - ((this.maxHealth - this.health) / this.maxHealth / 2)
+            myShape.alpha = 1 - ((this.stats.maxHealth - this.stats.currentHealth) / this.stats.maxHealth / 2)
         }
         myShape.lineStyle(2, this.team / 2);
         myShape.beginFill(this.team);
@@ -135,7 +147,7 @@ export class BlobShip extends Battler {
             }
         }
 
-        if (this.framesSinceFired >= this.fireInterval && disToTarget <= 200) {
+        if (this.framesSinceFired >= this.stats.fireInterval && disToTarget <= 200) {
             this.shootBullet();
             this.framesSinceFired = 0;
         }

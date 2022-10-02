@@ -14,6 +14,7 @@ import { BlobShip } from "../objects/ships/BlobShip";
 import { ObjectContainer } from "./BaseObject";
 import { Game } from "./Game";
 import { Sync } from "../net/client/Sync";
+import { IncreaseFireRate, IncreaseHealth } from "../objects/ships/Buffs";
 
 export class World implements ObjectContainer {
     
@@ -80,6 +81,10 @@ export class World implements ObjectContainer {
         Sync.state.players.forEach(p => {
             p.ships.forEach(ship => {
                 var bs = new BlobShip(ship.team);
+
+                bs.addBuff(new IncreaseHealth());
+                bs.addBuff(new IncreaseFireRate());
+                
                 bs.g.x = ship.x;
                 bs.g.y = ship.y;
                 this.addObject(bs);

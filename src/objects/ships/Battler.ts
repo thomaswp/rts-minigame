@@ -4,6 +4,8 @@ import { Sync } from '../../net/client/Sync';
 import { argMin, removeFrom } from "../../util/MathUtil";
 import { PhysicsObject } from "../PhysicsObject";
 import { Projectile } from "../projectile/Projectile";
+import { Buff } from './Buffs';
+import { BaseProperties, ShipProperties } from './ShipProperties';
 
 export abstract class Battler extends PhysicsObject {
 
@@ -15,6 +17,11 @@ export abstract class Battler extends PhysicsObject {
     dying = false;
     target: Battler;
     enemiesChasing = [] as Battler[];
+    startingProperties: BaseProperties;
+    properties: ShipProperties;
+
+    get stats() { return this.properties.currentProperties;}
+    
     // turn speed
     // fuel regen?
 
@@ -24,7 +31,11 @@ export abstract class Battler extends PhysicsObject {
     get dy() { return Math.sin(this.direction); }
 
     constructor(team: number, size = 15) {
-        super(); // do we need this when our parents are abstract classes?
+        super();
+        
+        this.startingProperties = new BaseProperties();
+        this.properties = new ShipProperties(this.startingProperties);
+        
         this.graphics = new Graphics();
         this.graphics = this.updateGraphics();
         this.team = team;
@@ -80,9 +91,20 @@ export abstract class Battler extends PhysicsObject {
         return;
     }
 
+    addBuff(buff: Buff) {
+        buff.ship = this;
+        this.properties.buffs.push(buff);
+    }
+
+    removeBuff(buff: Buff) {
+        removeFrom(this.properties.buffs, buff);
+    }
+
     update() {
+        // console.log(this.stats.currentHealth, '/', this.stats.maxHealth, this.stats.fireInterval);
         super.update();
         this.updateGraphics();
+        this.properties.update();
 
         if (this.dying) {
             return; // we forgot to finish this if statemnt, which was causing a lot of the weird behavior
@@ -95,7 +117,7 @@ export abstract class Battler extends PhysicsObject {
         this.enemiesChasing = 
             this.enemiesChasing.filter(e => e && e.isInWorld);
 
-        if (this.health <= 0) {
+        if (this.stats.currentHealth <= 0) {
             this.startToDie();
             return;
         }
