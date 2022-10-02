@@ -4,6 +4,8 @@ import { Sync } from '../../sync/Sync';
 import { argMin, removeFrom } from "../../util/MathUtil";
 import { PhysicsObject } from "../PhysicsObject";
 import { Projectile } from "../projectile/Projectile";
+import { Buff } from './Buffs';
+import { BaseProperties, ShipProperties } from './ShipProperties';
 
 export abstract class Battler extends PhysicsObject {
 
@@ -15,6 +17,11 @@ export abstract class Battler extends PhysicsObject {
     dying = false;
     target: Battler;
     enemiesChasing = [] as Battler[];
+    startingProperties: BaseProperties;
+    properties: ShipProperties;
+
+    get stats() { return this.properties.currentProperties;}
+    
     // turn speed
     // fuel regen?
 
@@ -24,7 +31,13 @@ export abstract class Battler extends PhysicsObject {
     get dy() { return Math.sin(this.direction); }
 
     constructor(team: number, size = 15) {
-        super(); // do we need this when our parents are abstract classes?
+        super();
+        
+        // this.properties = new ShipProperties(this.startingProperties);
+        // every battler will do this, but for now i need to have it in each child
+        // because startingProperties doesn't exist yet when battler's constructor
+        // is called, so properties will be undefined
+        
         this.graphics = new Graphics();
         this.graphics = this.updateGraphics();
         this.team = team;
@@ -80,9 +93,21 @@ export abstract class Battler extends PhysicsObject {
         return;
     }
 
+    addBuff(buff: Buff) {
+        buff.ship = this;
+        this.properties.buffs.push(buff);
+    }
+
+    removeBuff(buff: Buff) {
+        removeFrom(this.properties.buffs, buff);
+    }
+
     update() {
+        console.log('maxHealth: ', this.stats.maxHealth);
+        console.log('fireInterval: ', this.stats.fireInterval);
         super.update();
         this.updateGraphics();
+        this.properties.update();
 
         if (this.dying) {
             return; // we forgot to finish this if statemnt, which was causing a lot of the weird behavior
