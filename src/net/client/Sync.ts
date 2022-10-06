@@ -62,7 +62,10 @@ export class Sync {
             (location.port ? ':' + location.port : '');
 
         this.client = new Colyseus.Client(endpoint);
-        this.client.joinOrCreate("game_room").then(room_instance => {
+        this.client.joinOrCreate("game_room", {
+            name: 'Thomas',
+            test: 123,
+        }).then(room_instance => {
             this.state = room_instance.state as GameState;
             this.messenger.setSender(room_instance);            
             this.listeners.forEach(l => l());

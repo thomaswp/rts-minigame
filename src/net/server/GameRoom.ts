@@ -6,13 +6,16 @@ import { Messenger, Sender } from "../common/Messenger";
 export class GameRoom extends Room<GameState> {
     maxClients = 4;
 
+    messenger: Messenger;
+    gameLogic: GameLogic;
+
     onCreate (options) {
         console.log("StateHandlerRoom created!", options);
 
         this.setState(new GameState());
 
-        let messenger = new Messenger();
-        let gameLogic = new GameLogic(messenger, this.state);
+        this.messenger = new Messenger();
+        let gameLogic = this.gameLogic = new GameLogic(this.messenger, this.state);
 
         let me = this;
         let sender = {
@@ -28,19 +31,19 @@ export class GameRoom extends Room<GameState> {
                 me.clients.forEach(c => c.send(type, data));
             },
         } as Sender;
-        messenger.setSender(sender);
+        this.messenger.setSender(sender);
     }
 
     onAuth(client, options, req) {
         return true;
     }
 
-    onJoin (client: Client) {
-        this.state.createPlayer(client.sessionId);
+    onJoin (client: Client, options) {
+        this.gameLogic.onPlayerJoined(client.sessionId, options);
     }
 
     onLeave (client) {
-        // this.state.removePlayer(client.sessionId);
+        this.gameLogic.onPlayerLeft(client.sessionId);
     }
 
     onDispose () {

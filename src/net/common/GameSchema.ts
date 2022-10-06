@@ -9,6 +9,7 @@ export class Ship extends Schema {
 
 export class Player extends Schema {
     @type("string") name: string;
+    @type("boolean") connected: boolean;
     @type([Ship]) ships = new ArraySchema<Ship>();
 }
 
@@ -39,7 +40,6 @@ export class GameState extends Schema {
     };
 
     startRound() {
-        console.log("starting!!");
         this.roundNumber++;
         this.seed = Math.random();
         this.isRunning = true;
