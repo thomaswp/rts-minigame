@@ -6,6 +6,7 @@ export interface Sender {
 }
 
 export type AddShipArgs = { ship: Ship }
+export type RoundStartedArgs = { seed: number }
 
 export class Messenger {
 
@@ -13,11 +14,11 @@ export class Messenger {
     private messages = [] as Message<any>[];
 
     readonly addShip: Message<AddShipArgs>;
-    readonly roundStarted: Message<void>;
+    readonly roundStarted: Message<RoundStartedArgs>;
 
     constructor() {
         this.addShip = this.add(new Message<AddShipArgs>('addShip'));
-        this.roundStarted = this.add(new Message<void>('roundStarted'));
+        this.roundStarted = this.add(new Message<RoundStartedArgs>('roundStarted'));
     }
 
     private add<T>(message: Message<T>): Message<T> {
@@ -45,8 +46,12 @@ export class Message<Data> {
     setSender(sender: Sender) {
         this.sender = sender;
         sender.onMessage(this.type, data => {
-            this.callbacks.forEach(cb => cb(data));
+            this.receive(data);
         })
+    }
+
+    receive(data: Data) {
+        this.callbacks.forEach(cb => cb(data));
     }
 
     send(data: Data) {

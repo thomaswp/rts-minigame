@@ -19,6 +19,11 @@ export class GameState extends Schema {
     @type("number") roundNumber = 0;
     @type("number") seed = 0;
 
+    @type("boolean") isRunning = false;
+    @type("number") lastServerFrameCount = 0;
+    private tickInterval;
+    private roundStartTime = null as number;
+
     createPlayer(sessionId: string) {
         this.players.set(sessionId, new Player());
     }
@@ -32,4 +37,27 @@ export class GameState extends Schema {
         if (!player) return;
         player.ships.push(Object.assign(new Ship(), data));
     };
+
+    startRound() {
+        console.log("starting!!");
+        this.roundNumber++;
+        this.seed = Math.random();
+        this.isRunning = true;
+        this.lastServerFrameCount = 0;
+        this.roundStartTime = new Date().getTime();
+        this.tickInterval = setInterval(() => {
+            let elapsed = new Date().getTime() - this.roundStartTime;
+            let frames = elapsed * 60 / 1000;
+            // console.log(elapsed, frames);
+            this.lastServerFrameCount = frames;
+        }, 2000);
+    }
+
+    endRound() {
+        this.isRunning = false;
+        this.lastServerFrameCount = 0;
+        this.roundStartTime = null;
+        clearInterval(this.tickInterval);
+        this.tickInterval = null;
+    }
 }

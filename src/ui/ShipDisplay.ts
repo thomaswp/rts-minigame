@@ -45,9 +45,7 @@ export class ShipDisplay extends InterfaceObject implements ObjectContainer {
         let state = Sync.state;
         // listen to patches coming from the server
         state.players.onAdd = (player, sessionId) => {
-            console.log("player", player);
             player.ships.onAdd = (ship) => {
-                console.log(ship);
                 this.addShip(ship);
             }
         }

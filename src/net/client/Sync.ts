@@ -44,8 +44,16 @@ export class Sync {
 
     static listeners = [] as (() => void)[];
 
+    static get isConnected() { return this.state != null; }
+
     static init(seed: number) {
         this.random = new Random(seed);
+
+        this.messenger.roundStarted.on(({ seed }) => {
+            // console.log('SEED:', seed);
+            this.random = new Random(seed);
+            Matter.Common['_seed'] = this.random.float();
+        });
 
         // console.log(this.random.float(), this.random.int(0, 100), this.random.boolean());
 
@@ -56,16 +64,15 @@ export class Sync {
         this.client = new Colyseus.Client(endpoint);
         this.client.joinOrCreate("game_room").then(room_instance => {
             this.state = room_instance.state as GameState;
-            this.messenger.setSender(room_instance);
-
-            this.messenger.roundStarted.on(() => {
-                console.log(this.state.seed);
-                this.random = new Random(this.state.seed);
-                Matter.Common['_seed'] = this.random.float();
-            });
-
-            
+            this.messenger.setSender(room_instance);            
             this.listeners.forEach(l => l());
+
+            room_instance.onStateChange.once((state: GameState) => {
+                console.log('Start state', state, state.isRunning);
+                if (state.isRunning) {
+                    this.messenger.roundStarted.receive({seed: state.seed});
+                }
+            })
         }).catch(e => {
             console.error('Cannot connect to websocket!', e);
             return; // Client-only mode does not work yet! TODO!

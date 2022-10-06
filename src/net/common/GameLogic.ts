@@ -11,9 +11,8 @@ export class GameLogic {
         });
 
         messenger.roundStarted.on(() => {
-            state.roundNumber++;
-            state.seed = Math.random();
-            messenger.roundStarted.send();
+            state.startRound();
+            messenger.roundStarted.send({ seed: state.seed });
         });
     }
 }

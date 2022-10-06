@@ -40,7 +40,7 @@ export class GameRoom extends Room<GameState> {
     }
 
     onLeave (client) {
-        this.state.removePlayer(client.sessionId);
+        // this.state.removePlayer(client.sessionId);
     }
 
     onDispose () {

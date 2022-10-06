@@ -24,7 +24,6 @@ export class ShipIcon extends InterfaceObject {
                      .on('pointerover', this.onButtonOver, this)
                      .on('pointerout', this.onButtonOut, this);
 
-        console.log("Icon");
         ship.onRemove = () => {
             this.die();
         }

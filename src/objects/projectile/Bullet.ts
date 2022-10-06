@@ -22,7 +22,7 @@ export class Bullet extends Projectile {
     update(): void {
         super.update();
         let enemy = this.getNearestEnemy()
-        if (this.distanceTo(enemy) < this.size + enemy.size) {
+        if (enemy && this.distanceTo(enemy) < this.size + enemy.size) {
             enemy.stats.currentHealth -= 1;
             // some kind of animation here? fade on the projectile is weird, but maybe some kind of easy effect on the enemy?
             this.die();

@@ -40,6 +40,8 @@ export class World implements ObjectContainer {
     // cameraTarget: WorldObject;
     game: Game;
 
+    roundFrameCount = 0;
+
     constructor(width, height) {
         this.width = width;
         this.height = height;
@@ -78,6 +80,7 @@ export class World implements ObjectContainer {
     }
 
     startRound() {
+        this.roundFrameCount = 0;
         Sync.state.players.forEach(p => {
             p.ships.forEach(ship => {
                 var bs = new BlobShip(ship.team);
@@ -90,6 +93,14 @@ export class World implements ObjectContainer {
                 this.addObject(bs);
             });
         });
+
+        let lastRFC = 0;
+        setInterval(() => {
+            // console.log(this.roundFrameCount - lastRFC, 
+            //     this.roundFrameCount, 
+            //     Sync.state.lastServerFrameCount);            
+            lastRFC = this.roundFrameCount;
+        }, 1000)
     }
 
     createBackground() {
@@ -182,6 +193,15 @@ export class World implements ObjectContainer {
         })
     }
 
+    updateLogic() {
+        Matter.Engine.update(this.engine, 1000 / 60);
+
+        this.objects.forEach(obj => {
+            obj.update();
+        });
+        this.roundFrameCount++;
+    }
+
     update() {
         // let func = (x, y) => 3 * x;
         // func(3, 4);
@@ -194,13 +214,21 @@ export class World implements ObjectContainer {
 
         // this.cameraZoom *= 1.001;
 
+        if (!Sync.isConnected) return;
+
+        this.updateLogic();
+
+        const maxSkipFrames = 5;
+        let frames = 0;
+
+        while (this.roundFrameCount < Sync.state.lastServerFrameCount && 
+            frames < maxSkipFrames
+        ) {
+            this.updateLogic();
+            frames++;
+        }
+
         this.updateCamera();
         this.updateGameStage();
-
-        Matter.Engine.update(this.engine, 1000 / 60);
-
-        this.objects.forEach(obj => {
-            obj.update();
-        });
     }
 }
