@@ -48,6 +48,9 @@ export class GameState extends Schema {
             )[0];
         }
         if (!player) {
+            player = this.players.filter(p => !p.connected)[0];
+        }
+        if (!player) {
             player = new Player()
             this.players.push(player);
             player.color = playerColors[this.players.length - 1];
