@@ -4,18 +4,29 @@ export class Ship extends Schema {
     @type("string") type: string;
     @type("number") x: number;
     @type("number") y: number;
-    @type("number") team: number;
+    @type("number") color: number;
 }
+
+const playerColors = [
+    0xcc3333,
+    0x33cc33,
+    0x3333cc,
+    0xcc33cc,
+];
 
 export class Player extends Schema {
     @type("string") name: string;
     @type("boolean") connected: boolean;
+    @type("number") color: number;
     @type([Ship]) ships = new ArraySchema<Ship>();
 }
 
 export class GameState extends Schema {
-    @type({ map: Player })
-    players = new MapSchema<Player>();
+    @type([Player])
+    players = new ArraySchema<Player>();
+
+    @type({ map: "number" })
+    clientNumber = new MapSchema<number>();
 
     @type("number") roundNumber = 0;
     @type("number") seed = 0;
@@ -25,18 +36,38 @@ export class GameState extends Schema {
     private tickInterval;
     private roundStartTime = null as number;
 
-    createPlayer(sessionId: string) {
-        this.players.set(sessionId, new Player());
+    getPlayer(sessionId: string) {
+        return this.players[this.clientNumber.get(sessionId)];
     }
 
-    removePlayer(sessionId: string) {
-        this.players.delete(sessionId);
+    createOrBindPlayer(sessionId: string, name: string) {
+        let player = null;
+        if (name) {
+            player = this.players.filter(
+                p => p.name == name && !p.connected
+            )[0];
+        }
+        if (!player) {
+            player = new Player()
+            this.players.push(player);
+            player.color = playerColors[this.players.length - 1];
+        }
+        player.connected = true;
+        player.name = name;
+        this.clientNumber.set(sessionId, this.players.indexOf(player));
+    }
+
+    onPlayerLeft(sessionId: string) {
+        this.getPlayer(sessionId).connected = false;
+        this.clientNumber.delete(sessionId);
     }
 
     addShip(sessionId: string, data: Ship) {
-        let player = this.players.get(sessionId);
+        let player = this.getPlayer(sessionId);
         if (!player) return;
-        player.ships.push(Object.assign(new Ship(), data));
+        let ship = Object.assign(new Ship(), data);
+        ship.color = player.color;
+        player.ships.push(ship);
     };
 
     startRound() {

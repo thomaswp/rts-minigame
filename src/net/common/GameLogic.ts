@@ -5,6 +5,7 @@ export type JoinOptions = {
     name: string
 }
 
+
 export class GameLogic {
 
     currentClientID: string;
@@ -19,18 +20,24 @@ export class GameLogic {
             state.addShip(this.currentClientID, args.ship);
         });
 
-        messenger.roundStarted.on(() => {
+        messenger.tryStartRound.on(() => {
+            if (state.isRunning) return;
             state.startRound();
             messenger.roundStarted.send({ seed: state.seed });
+        });
+
+        messenger.tryEndRound.on(() => {
+            if (!state.isRunning) return;
+            state.endRound();
+            messenger.roundEnded.send();
         });
     }
 
     onPlayerJoined(clientID: string, options: JoinOptions) {
-        // TODO: read name
-        this.state.createPlayer(clientID);
+        this.state.createOrBindPlayer(clientID, options?.name);
     }
 
     onPlayerLeft(clientID: string) {
-
+        this.state.onPlayerLeft(clientID);
     }
 }

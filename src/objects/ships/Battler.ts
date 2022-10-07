@@ -60,6 +60,11 @@ export abstract class Battler extends PhysicsObject {
         bullet.vy = this.vy + dy * 10;
     }
 
+    die() {
+        super.die();
+        this.world.checkForRoundEnd();
+    }
+
     updateTarget() {
         if (this.target != null) {
             removeFrom(this.target.enemiesChasing, this);

@@ -11,7 +11,12 @@ export class Game {
 
     private framesBehind = 0;
 
+    static instance: Game;
+    static get width() { return this.instance.app.view.width; }
+    static get height() { return this.instance.app.view.height; }
+
     constructor(app: Application) {
+        Game.instance = this;
         this.app = app;
 
         Sync.init(Math.random());

@@ -17,6 +17,10 @@ import { Sync } from "../net/client/Sync";
 import { IncreaseFireRate, IncreaseHealth } from "../objects/ships/Buffs";
 
 export class World implements ObjectContainer {
+    // for (let i = 0; i < 10; i++) {
+    //     this.addObject(new BlobShip(0xcc3333));
+    //     this.addObject(new BlobShip(0x3333cc));
+    // }
     
     width: number;
     height: number;
@@ -76,6 +80,7 @@ export class World implements ObjectContainer {
         // }
 
         Sync.messenger.roundStarted.on(() => this.startRound());
+        Sync.messenger.roundEnded.on(() => this.endRound());
 
     }
 
@@ -83,7 +88,7 @@ export class World implements ObjectContainer {
         this.roundFrameCount = 0;
         Sync.state.players.forEach(p => {
             p.ships.forEach(ship => {
-                var bs = new BlobShip(ship.team);
+                var bs = new BlobShip(p.color);
 
                 bs.addBuff(new IncreaseHealth());
                 bs.addBuff(new IncreaseFireRate());
@@ -101,6 +106,27 @@ export class World implements ObjectContainer {
             //     Sync.state.lastServerFrameCount);            
             lastRFC = this.roundFrameCount;
         }, 1000)
+    }
+
+    endRound() {
+        this.clear();
+    }
+
+    clear() {
+        while (this.objects.length > 0) this.removeObject(this.objects[0]);
+    }
+
+    checkForRoundEnd() {
+        if (this.isRoundOver()) {
+            Sync.messenger.tryEndRound.send();
+        }
+    }
+
+    isRoundOver() {
+        let battlers = this.objects.filter(o => o instanceof Battler) as Battler[];
+        if (battlers.length == 0) return true;
+        let team = battlers[0].team;
+        return battlers.every(b => b.team == team);
     }
 
     createBackground() {

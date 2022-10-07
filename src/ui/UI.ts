@@ -31,10 +31,11 @@ export class UI implements ObjectContainer {
 
         this.addObject(new ShipDisplay());
 
-        Sync.listeners.push(() => {
-            Sync.messenger.roundStarted.on(() => {
-                this.mainContainer.visible = false;
-            });
+        Sync.messenger.roundStarted.on(() => {
+            this.mainContainer.visible = false;
+        });
+        Sync.messenger.roundEnded.on(() => {
+            this.mainContainer.visible = true;
         });
     }
 

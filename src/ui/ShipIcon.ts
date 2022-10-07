@@ -47,8 +47,8 @@ export class ShipIcon extends InterfaceObject {
     updateGraphics() {
         let myShape = this.graphics;
         myShape.clear();
-        myShape.lineStyle(2, this.ship.team / 2);
-        myShape.beginFill(this.ship.team);
+        myShape.lineStyle(2, this.ship.color / 2);
+        myShape.beginFill(this.ship.color);
         let size = this.size;
         myShape.drawCircle(0, 0, size);
         myShape.drawCircle(size, 0, 3);

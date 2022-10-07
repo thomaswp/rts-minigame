@@ -21,7 +21,6 @@ export class AddShipButton extends Button {
         ship.type = BlobShip.name;
         ship.x = Sync.random.floatRange(-300, 300);
         ship.y = Sync.random.floatRange(-200, 200);
-        ship.team = Sync.random.boolean() ? 0xcc3333 : 0x3333cc;
         Sync.messenger.addShip.send({ship});
     }
 

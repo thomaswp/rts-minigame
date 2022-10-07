@@ -12,7 +12,7 @@ export class StartGameButton extends Button {
     }
     
     onPressed(): void {
-        Sync.messenger.roundStarted.send();
+        Sync.messenger.tryStartRound.send();
     }
 
     updateGraphics() {

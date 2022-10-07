@@ -7,6 +7,7 @@ import { Sync } from "../net/client/Sync";
 import { BaseObject, ObjectContainer } from "../world/BaseObject";
 import { removeFrom } from "../util/MathUtil";
 import { UI } from "./UI";
+import { Game } from "../world/Game";
 
 // TODO: This is a problem with the "World" system
 // It assumes all things world updates have to be its container's direct
@@ -21,9 +22,8 @@ export class ShipDisplay extends InterfaceObject implements ObjectContainer {
         super();
         this.container = new Container();
         Sync.listeners.push(() => this.addListeners());
-        // TODO: get width/heights
-        this.g.x = 300;
-        this.g.y = 200;
+        this.g.x = Game.width / 2;
+        this.g.y = Game.height / 2;
     }
 
     removeObject(object: BaseObject<UI>): boolean {

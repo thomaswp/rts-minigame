@@ -21,7 +21,7 @@ export class GameRoom extends Room<GameState> {
         let sender = {
             onMessage(type, callback) {
                 me.onMessage(type, (client, data) => {
-                    console.log("Room received message from", client.sessionId, ":", data);
+                    console.log(`Room received ${type} from ${client.sessionId}`, data);
                     gameLogic.currentClientID = client.sessionId;
                     callback(data);
                 })

@@ -10,16 +10,13 @@ export type RoundStartedArgs = { seed: number }
 
 export class Messenger {
 
-    private sender: Sender;
     private messages = [] as Message<any>[];
 
-    readonly addShip: Message<AddShipArgs>;
-    readonly roundStarted: Message<RoundStartedArgs>;
-
-    constructor() {
-        this.addShip = this.add(new Message<AddShipArgs>('addShip'));
-        this.roundStarted = this.add(new Message<RoundStartedArgs>('roundStarted'));
-    }
+    readonly addShip = this.add(new Message<AddShipArgs>('addShip'));
+    readonly tryStartRound = this.add(new Message<void>('tryStartRound'));
+    readonly roundStarted = this.add(new Message<RoundStartedArgs>('roundStarted'));
+    readonly tryEndRound = this.add(new Message<void>('tryRoundEnd'));
+    readonly roundEnded = this.add(new Message<void>('roundEnded'));
 
     private add<T>(message: Message<T>): Message<T> {
         this.messages.push(message);
@@ -27,7 +24,6 @@ export class Messenger {
     }
 
     setSender(sender: Sender) {
-        this.sender = sender;
         this.messages.forEach(m => m.setSender(sender));
     }
 }
@@ -61,7 +57,6 @@ export class Message<Data> {
         this.sender.send(this.type, data);
     }
 
-    // TODO: Rename
     on(callback: (data: Data) => void) {
         this.callbacks.push(callback);
     }
