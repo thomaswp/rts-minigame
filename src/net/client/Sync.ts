@@ -66,6 +66,7 @@ export class Sync {
         const host = window.document.location.host.replace(/:.*/, '');
         const endpoint = location.protocol.replace("http", "ws") + "//" + host + 
             (location.port ? ':' + location.port : '');
+        console.log(endpoint);
 
         this.client = new Colyseus.Client(endpoint);
         this.client.joinOrCreate("game_room", {
@@ -82,19 +83,20 @@ export class Sync {
             })
         }).catch(e => {
             console.error('Cannot connect to websocket!', e);
-            return; // Client-only mode does not work yet! TODO!
-            console.error('Running in client mode.');
-            let id = 'localplayer';
-            this.state = new GameState();
-            let logic = new GameLogic(this.messenger, this.state);
-            logic.currentClientID = id;
-            let writeState = new GameState();
-            let sender = new ClientOnlySender(writeState, this.state);
-            this.messenger.setSender(sender);
-            this.listeners.forEach(l => l());
+            
+            // Client-only mode does not work yet! TODO!
+            // console.error('Running in client mode.');
+            // let id = 'localplayer';
+            // this.state = new GameState();
+            // let logic = new GameLogic(this.messenger, this.state);
+            // logic.currentClientID = id;
+            // let writeState = new GameState();
+            // let sender = new ClientOnlySender(writeState, this.state);
+            // this.messenger.setSender(sender);
+            // this.listeners.forEach(l => l());
 
-            writeState.createOrBindPlayer(id, 'Local Player');
-            sender.updateState();
+            // writeState.createOrBindPlayer(id, 'Local Player');
+            // sender.updateState();
         });
     }
 

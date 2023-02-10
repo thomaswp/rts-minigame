@@ -14,6 +14,7 @@ export class Messenger {
 
     readonly addShip = this.add(new Message<AddShipArgs>('addShip'));
     readonly tryStartRound = this.add(new Message<void>('tryStartRound'));
+    readonly tryAddAI = this.add(new Message<void>('tryAddAI'));
     readonly roundStarted = this.add(new Message<RoundStartedArgs>('roundStarted'));
     readonly tryEndRound = this.add(new Message<void>('tryRoundEnd'));
     readonly roundEnded = this.add(new Message<void>('roundEnded'));

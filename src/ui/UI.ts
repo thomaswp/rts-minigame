@@ -9,6 +9,7 @@ import { Button } from "./Button";
 import { InterfaceObject } from "./InterfaceObject";
 import { ShipDisplay } from "./ShipDisplay";
 import { StartGameButton } from "./StartGameButton";
+import { AddAIButton } from "./AddAIButton";
 
 export class UI implements ObjectContainer {
     mainContainer: Container;
@@ -28,6 +29,11 @@ export class UI implements ObjectContainer {
         startButton.g.x = 50;
         startButton.g.y = 140;
         this.addObject(startButton);
+
+        let addAIButton = new AddAIButton();
+        addAIButton.g.x = 50;
+        addAIButton.g.y = 230;
+        this.addObject(addAIButton);
 
         this.addObject(new ShipDisplay());
 

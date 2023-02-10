@@ -17,6 +17,7 @@ const playerColors = [
 export class Player extends Schema {
     @type("string") name: string;
     @type("boolean") connected: boolean;
+    @type("boolean") isAI = false;
     @type("number") color: number;
     @type([Ship]) ships = new ArraySchema<Ship>();
 }
@@ -42,18 +43,19 @@ export class GameState extends Schema {
 
     createOrBindPlayer(sessionId: string, name: string) {
         let player = null;
+        // First check to see if this player is reconnecting
         if (name) {
             player = this.players.filter(
                 p => p.name == name && !p.connected
             )[0];
         }
+        // If not, give them the first disconnected player (if possible)
         if (!player) {
             player = this.players.filter(p => !p.connected)[0];
         }
+        // Otherwise create a new player
         if (!player) {
-            player = new Player()
-            this.players.push(player);
-            player.color = playerColors[this.players.length - 1];
+            player = this.createPlayer();
         }
         player.connected = true;
         player.name = name;
@@ -72,6 +74,33 @@ export class GameState extends Schema {
         ship.color = player.color;
         player.ships.push(ship);
     };
+
+    createPlayer() {
+        let player = new Player()
+        this.players.push(player);
+        player.color = playerColors[this.players.length - 1];
+        return player;
+    }
+
+    createAI() {
+        let player = this.createPlayer();
+        player.isAI = true;
+        return player;
+    }
+
+    initAI() {
+        if (this.players.length == 4) return false;
+        let ai = this.createAI();
+        let player = this.players[0];
+        player.ships.forEach(ship => {
+            let newShip = ship.clone();
+            newShip.color = ai.color;
+            newShip.x += (Math.random() - 0.5) * 200;
+            newShip.y += (Math.random() - 0.5) * 200;
+            ai.ships.push(newShip);
+        });
+        return true;
+    }
 
     startRound() {
         this.roundNumber++;

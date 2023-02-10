@@ -4,6 +4,7 @@ import { Projectile } from "../projectile/Projectile";
 import { Bullet } from "../projectile/Bullet";
 import { BaseProperties, ShipProperties } from "./ShipProperties";
 import { Sync } from "../../net/client/Sync";
+import { Cannon } from "../weapons/Cannon";
 
 export class BlobShip extends Battler {
      
@@ -24,6 +25,7 @@ export class BlobShip extends Battler {
         super(team);
         this.startingProperties = new BaseProperties(10, .01, 999999999, 1, 1, 1, 60*2, 60*2, 1);
         this.properties = new ShipProperties(this.startingProperties);
+        this.weapons.push(new Cannon(this));
     }
 
 
@@ -52,11 +54,6 @@ export class BlobShip extends Battler {
         return myShape;
     }
 
-    shootBullet() {
-        let bullet = new Bullet(this.team, 90);
-        this.shoot(bullet);
-    }
-
     applyThrust() {
         if (this.thrust > this.fuel) this.thrust = 0;
         let dx = this.dx;
@@ -81,8 +78,8 @@ export class BlobShip extends Battler {
 
         let targetX = this.target.g.x;
         let targetY = this.target.g.y;
-        targetX += Math.cos(-this.target.direction) * 0;
-        targetY += Math.sin(-this.target.direction) * 0;
+        // targetX += Math.cos(-this.target.direction) * 0;
+        // targetY += Math.sin(-this.target.direction) * 0;
 
         let dirToTarget = this.directionTo(targetX, targetY);
         let disToTarget = this.distanceToXY(targetX, targetY);
@@ -145,11 +142,6 @@ export class BlobShip extends Battler {
                 // console.log('run!')
                 this.framesSinceEvaded = 0;
             }
-        }
-
-        if (this.framesSinceFired >= this.stats.fireInterval && disToTarget <= 200) {
-            this.shootBullet();
-            this.framesSinceFired = 0;
         }
     }
 }

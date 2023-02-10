@@ -20,6 +20,8 @@ export class GameLogic {
             state.addShip(this.currentClientID, args.ship);
         });
 
+        messenger.tryAddAI.on(args => state.initAI())
+
         messenger.tryStartRound.on(() => {
             if (state.isRunning) return;
             state.startRound();

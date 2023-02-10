@@ -4,6 +4,7 @@ import { Sync } from '../../net/client/Sync';
 import { argMin, removeFrom } from "../../util/MathUtil";
 import { PhysicsObject } from "../PhysicsObject";
 import { Projectile } from "../projectile/Projectile";
+import { Weapon } from '../weapons/Weapon';
 import { Buff } from './Buffs';
 import { BaseProperties, ShipProperties } from './ShipProperties';
 
@@ -19,6 +20,7 @@ export abstract class Battler extends PhysicsObject {
     enemiesChasing = [] as Battler[];
     startingProperties: BaseProperties;
     properties: ShipProperties;
+    weapons: Weapon[] = [];
 
     get stats() { return this.properties.currentProperties;}
     
@@ -48,7 +50,7 @@ export abstract class Battler extends PhysicsObject {
 
     abstract updateGraphics();
 
-    shoot(bullet: Projectile) {
+    fireProjectile(bullet: Projectile) {
         this.world.addObject(bullet);
         
         let dx = this.dx;
@@ -56,8 +58,9 @@ export abstract class Battler extends PhysicsObject {
         
         bullet.x = this.x + this.size * dx;
         bullet.y = this.y + this.size * dy;
-        bullet.vx = this.vx + dx * 10;
-        bullet.vy = this.vy + dy * 10;
+        bullet.vx = this.vx;
+        bullet.vy = this.vy;
+        bullet.direction = this.direction;
     }
 
     die() {
@@ -126,6 +129,8 @@ export abstract class Battler extends PhysicsObject {
             this.startToDie();
             return;
         }
+
+        this.weapons.forEach(w => w.update(this.target));
     }
 
 }
