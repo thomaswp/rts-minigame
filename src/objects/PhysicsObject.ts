@@ -5,6 +5,8 @@ function v(x: number, y: number) {
     return Matter.Vector.create(x, y);
 }
 
+const PYSICS_OBJ_TAG = 'physicsObject';
+
 export abstract class PhysicsObject extends WorldObject {
     
     get x() { return this.body.position.x; }
@@ -39,7 +41,12 @@ export abstract class PhysicsObject extends WorldObject {
         this.body = this.createBody();
         Matter.Body.setPosition(this.body, v(this.g.x, this.g.y));
         Matter.Composite.add(this.world.engine.world, this.body);
+        
+        // Add a reference to this object to the body so we can find it later
+        this.body[PYSICS_OBJ_TAG] = this;
     }
+
+    get monitorsCollisions() { return false; }
 
     die(): void {
         super.die();
@@ -52,6 +59,25 @@ export abstract class PhysicsObject extends WorldObject {
         this.g.x = this.body.position.x;
         this.g.y = this.body.position.y;
         this.g.rotation = this.body.angle;
+
+        if (this.monitorsCollisions) this.monitorCollisions();
+    }
+
+    monitorCollisions() {
+        // find all bodies currently colliding with this this.body
+        let collisions = Matter.Query.collides(
+            this.body, this.world.engine.world.bodies);
+        collisions.forEach(collision => {
+            let other = collision.bodyA == this.body ? collision.bodyB : collision.bodyA;
+            if (other == this.body) return;
+            let otherPhysicsObject = other[PYSICS_OBJ_TAG];
+            if (!otherPhysicsObject) return;
+            this.respondToCollision(otherPhysicsObject);
+        });
+        
+    }
+
+    respondToCollision(other: PhysicsObject) {
     }
 
     accelerateInDir(direction, magnitude) {

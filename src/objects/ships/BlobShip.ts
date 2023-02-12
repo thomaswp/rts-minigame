@@ -14,11 +14,7 @@ export class BlobShip extends Battler {
     thrust = 0;
     turnSpeed = 0.03;
     maxFuel = 999999999;
-    fuel = this.maxFuel;
-    private framesSinceFired = 0;
-    private framesSinceEvaded = 0;
-
-    
+    fuel = this.maxFuel;    
 
     // just testing this for now, still need to actually replace any this.property
     // everywhere with this.stats.property
@@ -27,7 +23,13 @@ export class BlobShip extends Battler {
         this.startingProperties = new BaseProperties(10, .01, 999999999, 1, 1, 1, 60*2, 60*2, 1);
         this.properties = new ShipProperties(this.startingProperties);
         // this.weapons.push(new Cannon(this));
-        this.weapons.push(new MissileLauncher(this));
+
+        if (Sync.random.boolean()) {
+            this.weapons.push(new MissileLauncher(this));
+        } else {
+            this.weapons.push(new Cannon(this));
+        }
+        this.weapons.forEach(w => w.addFireOffsetNoise());
     }
 
 
@@ -72,9 +74,6 @@ export class BlobShip extends Battler {
         this.applyThrust();
 
         if (this.dying) return;
-
-        this.framesSinceFired += 1;
-        this.framesSinceEvaded += 1;
 
         if (!this.target) return;
 

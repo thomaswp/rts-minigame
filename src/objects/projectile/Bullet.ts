@@ -1,4 +1,6 @@
 import * as Matter from "matter-js";
+import { PhysicsObject } from "../PhysicsObject";
+import { Battler } from "../ships/Battler";
 import { Projectile } from "./Projectile";
 
 export class Bullet extends Projectile {
@@ -19,14 +21,15 @@ export class Bullet extends Projectile {
         canvas.endFill();
     }
 
+    respondToCollision(other: PhysicsObject): void {
+        if (other instanceof Battler) {
+            other.stats.currentHealth -= 1;
+        }
+        this.die();
+    }
+
     update(): void {
         super.update();
-        let enemy = this.getNearestEnemy()
-        if (enemy && this.distanceTo(enemy) < this.size + enemy.size) {
-            enemy.stats.currentHealth -= 1;
-            // some kind of animation here? fade on the projectile is weird, but maybe some kind of easy effect on the enemy?
-            this.die();
-        }
         if (this.elapsedFrames > this.lifespan) {
             this.lifespan = Number.POSITIVE_INFINITY;
             this.run(() => {

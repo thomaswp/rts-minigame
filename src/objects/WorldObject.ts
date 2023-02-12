@@ -5,15 +5,6 @@ import { World } from "../world/World";
 
 export abstract class WorldObject extends BaseObject<World> implements Updater {
 
-    elapsedFrames = 0;
-    world: World;
-    updatables = [] as Updatable[];
-
-    get g() { return this.getDisplayObject(); }
-    get isInWorld() { return this.world.objects.includes(this); }
-
-    abstract getDisplayObject() : DisplayObject;
-
     shouldStayOnCamera(): boolean {
         return true;
     }

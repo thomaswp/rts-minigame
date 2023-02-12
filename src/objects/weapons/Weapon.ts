@@ -1,3 +1,4 @@
+import { Sync } from "../../net/client/Sync";
 import { PhysicsObject } from "../PhysicsObject";
 import { Projectile } from "../projectile/Projectile";
 import { Battler } from "../ships/Battler";
@@ -20,6 +21,10 @@ export abstract class Weapon {
     abstract get fireInterval(): number;
     abstract wantsToFire(target: PhysicsObject) : boolean;
     abstract fire(target: PhysicsObject) : void;
+
+    addFireOffsetNoise() {
+        this.framesSinceFired = Sync.random.int(0, this.fireInterval);
+    }
 
     canFire(target: PhysicsObject): boolean {
         if (!target) return false;

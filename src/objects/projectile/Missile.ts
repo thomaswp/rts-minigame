@@ -35,16 +35,18 @@ export class Missile extends Projectile {
         this.target = target;
     }
 
+    respondToCollision(other: PhysicsObject): void {
+        if (other instanceof Battler) {
+            other.stats.currentHealth -= this.damage;
+        }
+        this.die();
+    }
+
     update(): void {
         super.update();
-        if (this.isDead) return;
         this.accelerateInDir(this.direction, 0.2);
         if (this.target == null) return;
         this.rotateTowardsObj(this.target, 0.1);
-        if (this.distanceTo(this.target) < this.size + this.target.size) {
-            this.target.stats.currentHealth -= this.damage;
-            this.die();
-        }
         // Matter.Body.setAngularVelocity
     }
 }

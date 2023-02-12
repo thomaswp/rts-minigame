@@ -10,6 +10,11 @@ export abstract class Projectile extends PhysicsObject {
     team: number;
     lifespan: number;
     size: number;
+    
+    get monitorsCollisions(): boolean {
+        // Default to monitoring collisions for projectiles
+        return true;
+    }
 
     constructor(team = 0xcc3333, lifespan = 60, size = 4) { // = 0xcc3333
         super();
