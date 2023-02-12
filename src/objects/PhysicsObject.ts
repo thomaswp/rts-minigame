@@ -58,4 +58,20 @@ export abstract class PhysicsObject extends WorldObject {
         this.vx += Math.cos(direction) * magnitude;
         this.vy += Math.sin(direction) * magnitude;
     }
+
+    rotateTowardsObj(obj: PhysicsObject, by: number) {
+        this.rotateTowardsAngle(this.directionToObj(obj), by);
+    }
+
+    rotationDirectionTowards(angle: number) {
+        let diff = this.direction - angle;
+        if (diff < 0) diff += Math.PI * 2;
+        if (diff == 0) return 0;
+        return diff > 0 && diff < Math.PI  ? -1 : 1;
+    }
+
+    rotateTowardsAngle(angle: number, by: number) {
+        let rotationDir = this.rotationDirectionTowards(angle);
+        this.direction += rotationDir * by;
+    }
 }

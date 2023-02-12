@@ -5,13 +5,14 @@ import { Bullet } from "../projectile/Bullet";
 import { BaseProperties, ShipProperties } from "./ShipProperties";
 import { Sync } from "../../net/client/Sync";
 import { Cannon } from "../weapons/Cannon";
+import { MissileLauncher } from "../weapons/MissileLauncher";
 
 export class BlobShip extends Battler {
      
     fireInterval: number = 60 * 2;
     evasionInterval: number = 60 * 2;
     thrust = 0;
-    turnSpeed = .01;
+    turnSpeed = 0.03;
     maxFuel = 999999999;
     fuel = this.maxFuel;
     private framesSinceFired = 0;
@@ -25,7 +26,8 @@ export class BlobShip extends Battler {
         super(team);
         this.startingProperties = new BaseProperties(10, .01, 999999999, 1, 1, 1, 60*2, 60*2, 1);
         this.properties = new ShipProperties(this.startingProperties);
-        this.weapons.push(new Cannon(this));
+        // this.weapons.push(new Cannon(this));
+        this.weapons.push(new MissileLauncher(this));
     }
 
 
@@ -90,16 +92,7 @@ export class BlobShip extends Battler {
             if (oldTarget != this.target) return;
         }
 
-        let diff = this.direction - dirToTarget;
-        if (diff < 0) diff += Math.PI * 2;
-        let rotationDir;
-        if (diff > 0 && diff < Math.PI) {
-            rotationDir = -3;
-        } else {
-            rotationDir = 3;
-        }
-        this.direction += rotationDir * this.turnSpeed;
-
+        this.rotateTowardsAngle(dirToTarget, this.turnSpeed);
         
         if (this.fuel < this.maxFuel) {
             this.fuel += 1;
@@ -126,22 +119,22 @@ export class BlobShip extends Battler {
         }
 
         // moving relative to chaser, i.e. 'evasion'
-        let closestEnemy = this.getNearestEnemy(this.enemiesChasing);
-        if (closestEnemy) {
-            let distanceToChaser = this.distanceTo(closestEnemy);
-            if (distanceToChaser <= 350 && this.framesSinceEvaded >= this.evasionInterval) {
-                if (Sync.random.chance(0.75)) return; // just a temporary hack so they don't all 'evade' for the first time at the exact same instant
-                let dirToChaser = this.directionTo(closestEnemy.g.x, closestEnemy.g.y);
-                let magnitude = (350 - distanceToChaser) / 200; // evade harder if the enemy is closer, may want this to be nonlinear, also not sure if i like it logically
-                this.accelerateInDir(-dirToChaser, magnitude);
-                if (Sync.random.chance(0.5)) {
-                    this.accelerateInDir(dirToChaser + Math.PI / 2, magnitude);
-                } else {
-                    this.accelerateInDir(dirToChaser - Math.PI / 2, magnitude);
-                }
-                // console.log('run!')
-                this.framesSinceEvaded = 0;
-            }
-        }
+        // let closestEnemy = this.getNearestEnemy(this.enemiesChasing);
+        // if (closestEnemy) {
+        //     let distanceToChaser = this.distanceTo(closestEnemy);
+        //     if (distanceToChaser <= 350 && this.framesSinceEvaded >= this.evasionInterval) {
+        //         if (Sync.random.chance(0.75)) return; // just a temporary hack so they don't all 'evade' for the first time at the exact same instant
+        //         let dirToChaser = this.directionTo(closestEnemy.g.x, closestEnemy.g.y);
+        //         let magnitude = (350 - distanceToChaser) / 200; // evade harder if the enemy is closer, may want this to be nonlinear, also not sure if i like it logically
+        //         this.accelerateInDir(-dirToChaser, magnitude);
+        //         if (Sync.random.chance(0.5)) {
+        //             this.accelerateInDir(dirToChaser + Math.PI / 2, magnitude);
+        //         } else {
+        //             this.accelerateInDir(dirToChaser - Math.PI / 2, magnitude);
+        //         }
+        //         // console.log('run!')
+        //         this.framesSinceEvaded = 0;
+        //     }
+        // }
     }
 }

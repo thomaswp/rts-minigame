@@ -24,6 +24,10 @@ export abstract class WorldObject extends BaseObject<World> implements Updater {
         return val;
     }
 
+    directionToObj(obj: WorldObject) {
+        return this.directionTo(obj.g.x, obj.g.y);
+    }
+
     distanceToXY(x, y) {
         return Math.sqrt(
             Math.pow(x - this.g.x, 2) + 

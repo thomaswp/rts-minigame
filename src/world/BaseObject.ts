@@ -12,6 +12,7 @@ export abstract class BaseObject<WorldType extends ObjectContainer> implements U
     elapsedFrames = 0;
     world: WorldType;
     updatables = [] as Updatable[];
+    isDead = false;
 
     get g() { return this.getDisplayObject(); }
     get isInWorld() { return this.world.objects.includes(this); }
@@ -32,6 +33,7 @@ export abstract class BaseObject<WorldType extends ObjectContainer> implements U
     }
 
     die() {
+        this.isDead = true;
         this.world.removeObject(this);
     }
 
