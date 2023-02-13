@@ -15,13 +15,15 @@ export class MissileLauncher extends Weapon {
     }
 
     fire(target: PhysicsObject): void {
-        // TODO: Remove cast and use physics collisions instead
-        let missile = new Missile(this.parent.team, 10, target as Battler, 1.5);
-        this.parent.fireProjectile(missile);
+        let missile = new Missile(this.parent.team, 10, target, 1.5);
 
-        let dirToTarget = this.parent.directionTo(target.x, target.y);
-        missile.vx += Math.cos(dirToTarget) * 2;
-        missile.vy += Math.sin(dirToTarget) * 2;
+        let sideAngle = this.parent.direction + Math.PI / 2;
+        this.parent.fireProjectile(missile, sideAngle);
+        missile.direction = this.parent.direction;
+
+        // let dirToTarget = this.parent.directionTo(target.x, target.y);
+        missile.vx += Math.cos(sideAngle) * 2;
+        missile.vy += Math.sin(sideAngle) * 2;
     }
     
 }

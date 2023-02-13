@@ -11,7 +11,7 @@ export class Cannon extends Weapon {
 
     wantsToFire(target: PhysicsObject): boolean {
         let disToTarget = this.parent.distanceTo(target);
-        return disToTarget < 200;
+        return disToTarget < 550;
     }
 
     fire(target: PhysicsObject): void {

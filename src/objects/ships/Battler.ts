@@ -50,17 +50,17 @@ export abstract class Battler extends PhysicsObject {
 
     abstract updateGraphics();
 
-    fireProjectile(bullet: Projectile) {
+    fireProjectile(bullet: Projectile, direction = this.direction) {
         this.world.addObject(bullet);
         
-        let dx = this.dx;
-        let dy = this.dy;
+        let dx = Math.cos(direction);
+        let dy = Math.sin(direction);
         
-        bullet.x = this.x + this.size * dx;
-        bullet.y = this.y + this.size * dy;
+        bullet.x = this.x + this.size * dx * 1.05;
+        bullet.y = this.y + this.size * dy * 1.05;
         bullet.vx = this.vx;
         bullet.vy = this.vy;
-        bullet.direction = this.direction;
+        bullet.direction = direction;
     }
 
     die() {

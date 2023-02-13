@@ -99,13 +99,13 @@ export class BlobShip extends Battler {
 
         // moving relative to target
         if (this.fuel > this.maxFuel / 2) {
-            if (disToTarget > 200) {
+            if (disToTarget > 500) {
                 // this.accelerateInDir(dirToTarget, 0.1);
-                this.thrust = 5;
-            } else if (disToTarget < 150 && disToTarget >= 100) {
-                this.thrust *= .98;
-            } else if (disToTarget < 100) {
+                this.thrust = 3;
+            } else if (disToTarget < 200) {
                 this.thrust = -1;
+            } else {
+                this.thrust *= 0.7;
             }
             // else if (this.chasingMe) {
             //     let distanceToChaser = this.distanceTo(this.chasingMe);

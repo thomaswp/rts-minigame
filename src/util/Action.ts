@@ -7,18 +7,20 @@ export interface Updater {
     updatables: Updatable[];
 }
 
+/**
+ * A function that will be called every frame until it returns true.
+ */
 export type UpdateFunction = () => (boolean | void)
 
 export class Action implements Updatable {
 
     runner: Updater;
-    updater: UpdateFunction;
+    updaters: UpdateFunction[] = [];
     onSuccess: (value: void | PromiseLike<void>) => void;
-    nextAction: Action;
 
-    constructor(runner: Updater, update: UpdateFunction) {
+    constructor(runner: Updater, update?: UpdateFunction) {
         this.runner = runner;
-        this.updater = update;
+        if (update) this.then(update);
     }
 
     run() {
@@ -26,18 +28,30 @@ export class Action implements Updatable {
         return this;
     }
 
+    remove() {
+        let index = this.runner.updatables.indexOf(this);
+        if (index !== -1) this.runner.updatables.splice(index, 1);
+    }
+
     update() {
-        let result = this.updater();
-        if (result === undefined || result) {
-            let index = this.runner.updatables.indexOf(this);
-            if (index !== -1) this.runner.updatables.splice(index, 1);
-            if (this.nextAction) this.nextAction.run();
+        // If we're out of things to do, remove ourselves from the runner
+        if (this.updaters.length == 0) {
+            this.remove();
+            return;
+        }
+        
+        // Run the next update function
+        let next = this.updaters[0];
+        if (next()) {
+            // If it's completed, remove it and update again
+            this.updaters.shift();
+            this.update();
         }
     }
 
     then(update: UpdateFunction) {
-        this.nextAction = new Action(this.runner, update);
-        return this.nextAction;
+        this.updaters.push(update);
+        return this;
     }
 
     wait(frames: number) {
