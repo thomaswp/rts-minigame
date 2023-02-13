@@ -1,4 +1,4 @@
-export const sparkle = {
+export const exhaustConfig = {
 	"alpha": {
 		"start": 1,
 		"end": 0

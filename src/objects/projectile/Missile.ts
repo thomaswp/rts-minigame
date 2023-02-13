@@ -1,6 +1,7 @@
 import Matter from "matter-js";
 import { Body } from "matter-js";
 import { Exhaust } from "../effects/Exhaust";
+import { Explosion } from "../effects/Explosion";
 import { PhysicsObject } from "../PhysicsObject";
 import { Battler } from "../ships/Battler";
 import { Projectile } from "./Projectile";
@@ -54,6 +55,7 @@ export class Missile extends Projectile {
 
     die(): void {
         super.die();
+        this.world.addObject(new Explosion(this.x, this.y));
         this.exhaust.fadeOut();
     }
 
