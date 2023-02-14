@@ -42,8 +42,7 @@ export class Missile extends Projectile {
         super.onAddedToWorld();
         this.exhaust = new Exhaust();
         this.world.addObject(this.exhaust);
-        let scale = 0.3;
-        this.exhaust.g.scale = {x: scale, y: scale};
+        this.exhaust.scale = 0.5;
     }
 
     respondToCollision(other: PhysicsObject): void {
@@ -66,9 +65,8 @@ export class Missile extends Projectile {
     updateExhaust(): void {
         let x = this.x - Math.cos(this.direction) * this.width / 2;
         let y = this.y - Math.sin(this.direction) * this.width / 2;
-        this.exhaust.g.x = x;
-        this.exhaust.g.y = y;
-        this.exhaust.g.rotation = this.g.rotation;
+        this.exhaust.setRotation(this.direction);
+        this.exhaust.setPosition(x, y);
     }
 
     update(): void {

@@ -7,11 +7,15 @@ import { Sync } from "../../net/client/Sync";
 import { Cannon } from "../weapons/Cannon";
 import { MissileLauncher } from "../weapons/MissileLauncher";
 import { Point } from "pixi.js";
+import { ParticleEffect } from "../effects/ParticleEffect";
+import { Exhaust } from "../effects/Exhaust";
+import { tailConfig } from "../effects/particles/tail";
 
 export class FighterShip extends Battler {
      
     thrust = 0;
-    turnSpeed = 0.03;
+    turnSpeed = 0.015;
+    exhaust: ParticleEffect
 
     // just testing this for now, still need to actually replace any this.property
     // everywhere with this.stats.property
@@ -20,6 +24,8 @@ export class FighterShip extends Battler {
         this.startingProperties = new BaseProperties(10, .01, 999999999, 1, 1, 1, 60*2, 60*2, 1);
         this.properties = new ShipProperties(this.startingProperties);
         // this.weapons.push(new Cannon(this));
+
+        this.exhaust = new Exhaust(tailConfig);
 
         this.graphics.addChild(
             this.createGraphicsFromPoints(this.createShipPoints(), this.team)
@@ -41,6 +47,13 @@ export class FighterShip extends Battler {
     onAddedToWorld(): void {
         super.onAddedToWorld();
         this.updateTarget();
+        this.exhaust.scale = 0.7;
+        this.world.addObject(this.exhaust);
+    }
+
+    die(): void {
+        super.die();
+        this.exhaust.fadeOut();
     }
 
     createShipPoints(): Point[] {
@@ -60,12 +73,20 @@ export class FighterShip extends Battler {
         this.vx += dx * this.thrust / 60;
         this.vy += dy * this.thrust / 60;
     }
+
+    updateExhaust(): void {
+        let x = this.x - Math.cos(this.direction) * this.size / 2;
+        let y = this.y - Math.sin(this.direction) * this.size / 2;
+        this.exhaust.setPosition(x, y);
+        this.exhaust.setRotation(this.direction);
+    }
     
 
     update(): void {
         super.update();
 
         this.applyThrust();
+        this.updateExhaust();
 
         if (this.dying) return;
 
@@ -85,17 +106,18 @@ export class FighterShip extends Battler {
             if (oldTarget != this.target) return;
         }
 
-        this.rotateTowardsAngle(dirToTarget, this.turnSpeed);
+        this.rotateTowardsAngle(this.directionTo(0, 0), this.turnSpeed);
         
+        this.thrust = 3;
 
-        if (disToTarget > 500) {
-            // this.accelerateInDir(dirToTarget, 0.1);
-            this.thrust = 3;
-        } else if (disToTarget < 200) {
-            this.thrust = -1;
-        } else {
-            this.thrust *= 0.7;
-        }
+        // if (disToTarget > 500) {
+        //     // this.accelerateInDir(dirToTarget, 0.1);
+        //     this.thrust = 3;
+        // } else if (disToTarget < 200) {
+        //     this.thrust = -1;
+        // } else {
+        //     this.thrust *= 0.7;
+        // }
         // else if (this.chasingMe) {
         //     let distanceToChaser = this.distanceTo(this.chasingMe);
         //     if (distanceToChaser < 300) {

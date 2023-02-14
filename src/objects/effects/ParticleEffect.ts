@@ -11,6 +11,11 @@ export abstract class ParticleEffect extends WorldObject {
 
     isFadingOut = false;
 
+    get scale() { return this.particleContainer.scale.x; }
+    set scale(val) { 
+        this.particleContainer.scale.set(val); 
+    }
+
     constructor(upgradedConfig: EmitterConfigV3) {
         super();
         this.particleContainer = new Container();
@@ -19,6 +24,20 @@ export abstract class ParticleEffect extends WorldObject {
             upgradedConfig
         );
         this.emitter.emit = true;
+    }
+
+    setPosition(x: number, y: number) {
+        this.emitter.spawnPos.x = x / this.scale;
+        this.emitter.spawnPos.y = y / this.scale;
+    }
+
+    setRotation(rotation: number) {
+        let x = this.emitter.spawnPos.x;
+        let y = this.emitter.spawnPos.y;
+        this.emitter.rotate(rotation);
+        // Because rotate changes the spawnPos, we need to reset it
+        this.emitter.spawnPos.x = x;
+        this.emitter.spawnPos.y = y;
     }
 
     getDisplayObject(): DisplayObject {

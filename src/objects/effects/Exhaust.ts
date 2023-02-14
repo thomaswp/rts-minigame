@@ -5,7 +5,11 @@ import { ParticleEffect } from "./ParticleEffect";
 
 export class Exhaust extends ParticleEffect {
 
-    constructor() {
-        super(upgradeConfig(exhaustConfig, [Texture.from("img/particle.png")]));
+    constructor(config = exhaustConfig) {
+        super(upgradeConfig(config, [Texture.from("img/particle.png")]));
+    }
+
+    onAddedToWorld(): void {
+        this.g.zIndex = -10;
     }
 }
