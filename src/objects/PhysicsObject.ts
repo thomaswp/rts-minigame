@@ -1,5 +1,6 @@
 import { WorldObject } from "./WorldObject";
 import * as Matter from 'matter-js';
+import { Graphics, Point } from "pixi.js";
 
 function v(x: number, y: number) {
     return Matter.Vector.create(x, y);
@@ -70,11 +71,34 @@ export abstract class PhysicsObject extends WorldObject {
         collisions.forEach(collision => {
             let other = collision.bodyA == this.body ? collision.bodyB : collision.bodyA;
             if (other == this.body) return;
-            let otherPhysicsObject = other[PYSICS_OBJ_TAG];
+            let otherPhysicsObject =  null;
+            // Look up the tree of parents until we find a body with a physics object
+            // Or until we hit a physics object with a self-reference
+            while (true) {
+                otherPhysicsObject = other[PYSICS_OBJ_TAG];
+                if (otherPhysicsObject || other.parent == other) break;
+                other = other.parent;
+            }
             if (!otherPhysicsObject) return;
             this.respondToCollision(otherPhysicsObject);
         });
-        
+    }
+
+    createBodyFromPoints(points: Point[]) {
+        let vertices = points.map(p => v(p.x, p.y));
+        return Matter.Bodies.fromVertices(0, 0, [vertices]);
+    }
+
+    createGraphicsFromPoints(points: Point[], color: number) {
+        let g = new Graphics();
+        g.beginFill(color);
+        g.lineStyle(2, color / 2);
+        g.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+            g.lineTo(points[i].x, points[i].y);
+        }
+        g.endFill();
+        return g;
     }
 
     respondToCollision(other: PhysicsObject) {

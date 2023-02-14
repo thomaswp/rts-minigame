@@ -1,5 +1,5 @@
 import { DisplayObject, Graphics } from "pixi.js";
-import { BlobShip } from "../objects/ships/BlobShip";
+import { FighterShip } from "../objects/ships/FighterShip";
 import { Ship } from "../net/common/GameSchema";
 import { Sync } from "../net/client/Sync";
 import { Button } from "./Button";

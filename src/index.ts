@@ -5,8 +5,8 @@ import { World } from "./world/World";
 window.onload = function() {
     // Create the application helper and add its render target to the page
     let app = new PIXI.Application({ 
-        width: 800, 
-        height: 500,
+        width: 1200, 
+        height: 800,
     });
     document.body.appendChild(app.view);
 

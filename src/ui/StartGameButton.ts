@@ -1,9 +1,6 @@
-import { DisplayObject, Graphics } from "pixi.js";
-import { BlobShip } from "../objects/ships/BlobShip";
-import { Ship } from "../net/common/GameSchema";
+
 import { Sync } from "../net/client/Sync";
 import { Button } from "./Button";
-import { InterfaceObject } from "./InterfaceObject";
 
 export class StartGameButton extends Button {
     

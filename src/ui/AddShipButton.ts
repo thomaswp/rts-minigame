@@ -1,9 +1,8 @@
-import { DisplayObject, Graphics } from "pixi.js";
-import { BlobShip } from "../objects/ships/BlobShip";
+
+import { FighterShip } from "../objects/ships/FighterShip";
 import { Ship } from "../net/common/GameSchema";
 import { Sync } from "../net/client/Sync";
 import { Button } from "./Button";
-import { InterfaceObject } from "./InterfaceObject";
 
 export class AddShipButton extends Button {
     
@@ -18,7 +17,7 @@ export class AddShipButton extends Button {
     
     onPressed(): void {
         let ship = new Ship()
-        ship.type = BlobShip.name;
+        ship.type = FighterShip.name;
         ship.x = Sync.random.floatRange(-300, 300);
         ship.y = Sync.random.floatRange(-200, 200);
         Sync.messenger.addShip.send({ship});

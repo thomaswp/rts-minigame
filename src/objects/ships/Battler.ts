@@ -1,7 +1,8 @@
 import * as Matter from 'matter-js';
-import { DisplayObject, Graphics } from "pixi.js";
+import { Container, DisplayObject, Graphics } from "pixi.js";
 import { Sync } from '../../net/client/Sync';
 import { argMin, removeFrom } from "../../util/MathUtil";
+import { Explosion } from '../effects/Explosion';
 import { PhysicsObject } from "../PhysicsObject";
 import { Projectile } from "../projectile/Projectile";
 import { Weapon } from '../weapons/Weapon';
@@ -10,7 +11,7 @@ import { BaseProperties, ShipProperties } from './ShipProperties';
 
 export abstract class Battler extends PhysicsObject {
 
-    graphics: Graphics;
+    graphics: Container;
     size: number;
     maxHealth = 10;
     health = this.maxHealth;
@@ -38,8 +39,7 @@ export abstract class Battler extends PhysicsObject {
         this.startingProperties = new BaseProperties();
         this.properties = new ShipProperties(this.startingProperties);
         
-        this.graphics = new Graphics();
-        this.graphics = this.updateGraphics();
+        this.graphics = new Container();
         this.team = team;
         
         // should we assign positions randomly in the world instead of per battler, and should we try splitting the arena in 2 for each team?
@@ -47,8 +47,6 @@ export abstract class Battler extends PhysicsObject {
         this.g.y = Sync.random.floatRange(-200, 200);
         this.size = size;
     }
-
-    abstract updateGraphics();
 
     fireProjectile(bullet: Projectile, direction = this.direction) {
         this.world.addObject(bullet);
@@ -65,6 +63,7 @@ export abstract class Battler extends PhysicsObject {
 
     die() {
         super.die();
+        this.world.addObject(new Explosion(this.x, this.y));
         this.world.checkForRoundEnd();
     }
 
@@ -111,7 +110,6 @@ export abstract class Battler extends PhysicsObject {
     update() {
         // console.log(this.stats.currentHealth, '/', this.stats.maxHealth, this.stats.fireInterval);
         super.update();
-        this.updateGraphics();
         this.properties.update();
 
         if (this.dying) {

@@ -10,7 +10,7 @@ import * as Matter from 'matter-js';
 import * as PolyDecomp from 'poly-decomp'
 import * as hull from 'hull.js'
 import { lerp } from "../util/MathUtil";
-import { BlobShip } from "../objects/ships/BlobShip";
+import { FighterShip } from "../objects/ships/FighterShip";
 import { ObjectContainer } from "./BaseObject";
 import { Game } from "./Game";
 import { Sync } from "../net/client/Sync";
@@ -88,7 +88,7 @@ export class World implements ObjectContainer {
         this.roundFrameCount = 0;
         Sync.state.players.forEach(p => {
             p.ships.forEach(ship => {
-                var bs = new BlobShip(p.color);
+                var bs = new FighterShip(p.color);
 
                 bs.addBuff(new IncreaseHealth());
                 bs.addBuff(new IncreaseFireRate());
